@@ -51,3 +51,18 @@ test("GET /health reports service health", async () => {
   assert.equal(response.json().status, "ok");
   await app.close();
 });
+
+test("GET / serves the mobile-friendly clipping page", async () => {
+  const app = await buildApp(config);
+  const response = await app.inject({
+    method: "GET",
+    url: "/",
+  });
+
+  assert.equal(response.statusCode, 200);
+  assert.match(response.headers["content-type"] ?? "", /^text\/html/);
+  assert.match(response.body, /<meta name="viewport"/);
+  assert.match(response.body, /保存到 Obsidian/);
+  assert.match(response.body, /fetch\("\/api\/clips"/);
+  await app.close();
+});
