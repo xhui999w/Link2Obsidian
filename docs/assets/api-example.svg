@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">Link2Obsidian API 调用示例</title>
+  <desc id="desc">在终端提交网页链接并收到文章保存结果</desc>
+  <rect width="1200" height="620" rx="18" fill="#111827"/>
+  <rect width="1200" height="56" rx="18" fill="#1f2937"/>
+  <rect y="38" width="1200" height="18" fill="#1f2937"/>
+  <circle cx="30" cy="28" r="8" fill="#fb7185"/>
+  <circle cx="56" cy="28" r="8" fill="#fbbf24"/>
+  <circle cx="82" cy="28" r="8" fill="#34d399"/>
+  <text x="600" y="34" text-anchor="middle" fill="#d1d5db" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="16">Link2Obsidian · NAS Terminal</text>
+  <g font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="19">
+    <text x="34" y="94" fill="#34d399">$</text>
+    <text x="58" y="94" fill="#f9fafb">curl -X POST http://192.168.1.20:8080/api/clips \</text>
+    <text x="58" y="128" fill="#f9fafb">  -H "Content-Type: application/json" \</text>
+    <text x="58" y="162" fill="#f9fafb">  -d '{"url":"https://example.com/sleep"}'</text>
+    <text x="34" y="216" fill="#93c5fd">{</text>
+    <text x="62" y="250" fill="#f9fafb">"status": </text>
+    <text x="184" y="250" fill="#a7f3d0">"saved"</text>
+    <text x="270" y="250" fill="#f9fafb">,</text>
+    <text x="62" y="284" fill="#f9fafb">"plugin": </text>
+    <text x="174" y="284" fill="#a7f3d0">"toutiao"</text>
+    <text x="62" y="318" fill="#f9fafb">"category": </text>
+    <text x="206" y="318" fill="#fde68a">"健康养生"</text>
+    <text x="62" y="352" fill="#f9fafb">"tags": [</text>
+    <text x="174" y="352" fill="#fde68a">"健康", "睡眠", "头条"</text>
+    <text x="446" y="352" fill="#f9fafb">],</text>
+    <text x="62" y="386" fill="#f9fafb">"ai": </text>
+    <text x="140" y="386" fill="#a7f3d0">"disabled"</text>
+    <text x="62" y="420" fill="#f9fafb">"file": </text>
+    <text x="162" y="420" fill="#93c5fd">"Clippings/健康养生/改善睡眠--a1b2c3d4e5.md"</text>
+    <text x="62" y="454" fill="#f9fafb">"images": {"downloaded": 2, "failed": 0}</text>
+    <text x="34" y="488" fill="#93c5fd">}</text>
+  </g>
+  <rect x="34" y="532" width="1132" height="56" rx="10" fill="#172554"/>
+  <text x="58" y="568" fill="#bfdbfe" font-family="system-ui, sans-serif" font-size="20">✓ 网页正文、分类和图片已经写入 Obsidian Vault</text>
+</svg>
+

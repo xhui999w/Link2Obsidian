@@ -1,0 +1,38 @@
+{
+  "apiVersion": "1",
+  "id": "toutiao",
+  "name": "今日头条",
+  "priority": 100,
+  "sourceTag": "头条",
+  "match": {
+    "hostnames": [
+      "toutiao.com",
+      "*.toutiao.com"
+    ]
+  },
+  "page": {
+    "waitForSelector": "article, .article-content, [class*=\"article-content\"]",
+    "removeSelectors": [
+      "[class*=\"recommend\"]",
+      "[class*=\"comment\"]",
+      "[class*=\"related\"]",
+      "[class*=\"toolbar\"]"
+    ]
+  },
+  "extraction": {
+    "contentSelector": "article, .article-content, [class*=\"article-content\"]",
+    "titleSelectors": [
+      "h1",
+      ".article-title",
+      "[class*=\"article-title\"]",
+      "meta[property=\"og:title\"]"
+    ],
+    "sourceSelectors": [
+      "[class*=\"author-name\"]",
+      "[class*=\"user-name\"]",
+      "meta[name=\"author\"]",
+      "meta[property=\"og:site_name\"]"
+    ],
+    "removeHiddenElements": false
+  }
+}

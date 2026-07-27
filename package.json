@@ -1,0 +1,21 @@
+{
+  "name": "link2obsidian",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Turn web links into Markdown files for an Obsidian vault.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=@link2obsidian/plugin-api && npm run build --workspace=@link2obsidian/server",
+    "dev": "npm run dev --workspace=@link2obsidian/server",
+    "start": "npm run start --workspace=@link2obsidian/server",
+    "typecheck": "npm run build --workspace=@link2obsidian/plugin-api && npm run typecheck --workspace=@link2obsidian/server",
+    "test": "npm run test --workspaces --if-present"
+  }
+}

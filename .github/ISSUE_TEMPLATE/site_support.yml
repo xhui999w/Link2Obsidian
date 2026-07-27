@@ -1,0 +1,63 @@
+name: Site adapter / 网站适配
+description: Request or repair article extraction for a website
+title: "[Site]: "
+labels:
+  - site-adapter
+body:
+  - type: input
+    id: site
+    attributes:
+      label: Website / 网站
+      placeholder: Website name and domain
+    validations:
+      required: true
+  - type: dropdown
+    id: existing
+    attributes:
+      label: Adapter / 当前适配
+      options:
+        - General / 普通网页
+        - Toutiao / 今日头条
+        - Zhihu / 知乎
+        - WeChat / 微信公众号
+        - New site / 新网站
+    validations:
+      required: true
+  - type: textarea
+    id: url
+    attributes:
+      label: Example URL / 示例链接
+      description: Use a public URL or describe the URL pattern if the page is private.
+    validations:
+      required: true
+  - type: checkboxes
+    id: symptoms
+    attributes:
+      label: Symptoms / 问题表现
+      options:
+        - label: Missing or wrong title / 标题错误
+        - label: Missing body / 正文缺失
+        - label: Too much navigation, comments, or recommendations / 噪声过多
+        - label: Missing images / 图片缺失
+        - label: Login or verification page / 登录或验证页
+        - label: Other / 其他
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected content / 预期内容
+      description: Describe the correct title, source, and main-content area.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / 日志
+      render: shell
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy / 隐私
+      options:
+        - label: The URL and logs do not contain private information. / 链接和日志不包含隐私信息。
+          required: true
+

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">Link2Obsidian 生成的 Vault 示例</title>
+  <desc id="desc">左侧显示分类目录和附件，右侧显示 Markdown Frontmatter</desc>
+  <rect width="1200" height="680" rx="18" fill="#f8fafc"/>
+  <rect width="1200" height="58" rx="18" fill="#312e81"/>
+  <rect y="40" width="1200" height="18" fill="#312e81"/>
+  <text x="34" y="37" fill="#eef2ff" font-family="system-ui, sans-serif" font-size="22" font-weight="700">Obsidian Vault · Link2Obsidian</text>
+  <rect x="0" y="58" width="420" height="622" fill="#eef2ff"/>
+  <line x1="420" y1="58" x2="420" y2="680" stroke="#c7d2fe" stroke-width="2"/>
+  <g font-family="system-ui, sans-serif" font-size="21" fill="#1e1b4b">
+    <text x="28" y="104" font-weight="700">MyVault</text>
+    <text x="52" y="144">▾ 📁 Clippings</text>
+    <text x="78" y="184">▾ 📁 健康养生</text>
+    <rect x="88" y="200" width="304" height="40" rx="8" fill="#c7d2fe"/>
+    <text x="104" y="227">📄 改善睡眠--a1b2c3d4e5.md</text>
+    <text x="78" y="274">▸ 📁 AI人工智能</text>
+    <text x="78" y="314">▸ 📁 编程开发</text>
+    <text x="52" y="366">▾ 📁 Attachments</text>
+    <text x="78" y="406">▾ 📁 改善睡眠--a1b2c3d4e5</text>
+    <text x="104" y="446">🖼 image001.jpg</text>
+    <text x="104" y="486">🖼 image002.png</text>
+  </g>
+  <text x="462" y="104" fill="#312e81" font-family="system-ui, sans-serif" font-size="28" font-weight="700">改善睡眠的方法</text>
+  <line x1="462" y1="122" x2="1156" y2="122" stroke="#cbd5e1"/>
+  <g font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">
+    <text x="462" y="164" fill="#64748b">---</text>
+    <text x="462" y="196" fill="#334155">title: "改善睡眠的方法"</text>
+    <text x="462" y="228" fill="#334155">source: "示例健康账号"</text>
+    <text x="462" y="260" fill="#334155">url: "https://example.com/sleep"</text>
+    <text x="462" y="292" fill="#334155">category: "健康养生"</text>
+    <text x="462" y="324" fill="#334155">tags: ["健康","睡眠","头条"]</text>
+    <text x="462" y="356" fill="#64748b">---</text>
+    <text x="462" y="410" fill="#0f172a">网页正文已经转换为 Markdown……</text>
+    <text x="462" y="456" fill="#4f46e5">![[Attachments/改善睡眠--a1b2c3d4e5/image001.jpg]]</text>
+  </g>
+  <rect x="462" y="514" width="694" height="112" rx="12" fill="#e0e7ff"/>
+  <text x="488" y="554" fill="#3730a3" font-family="system-ui, sans-serif" font-size="20" font-weight="700">Obsidian 标签</text>
+  <g font-family="system-ui, sans-serif" font-size="18">
+    <rect x="488" y="574" width="78" height="34" rx="17" fill="#c7d2fe"/>
+    <text x="505" y="597" fill="#312e81">#健康</text>
+    <rect x="578" y="574" width="78" height="34" rx="17" fill="#c7d2fe"/>
+    <text x="595" y="597" fill="#312e81">#睡眠</text>
+    <rect x="668" y="574" width="78" height="34" rx="17" fill="#c7d2fe"/>
+    <text x="685" y="597" fill="#312e81">#头条</text>
+  </g>
+</svg>
+

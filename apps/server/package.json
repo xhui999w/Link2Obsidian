@@ -1,0 +1,30 @@
+{
+  "name": "@link2obsidian/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/main.ts",
+    "start": "node dist/main.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --import tsx --test test/**/*.test.ts"
+  },
+  "dependencies": {
+    "@fastify/sensible": "^6.0.3",
+    "@link2obsidian/plugin-api": "0.1.0",
+    "defuddle": "^0.19.2",
+    "fastify": "^5.2.1",
+    "linkedom": "^0.18.13",
+    "playwright": "^1.62.0",
+    "turndown": "^7.2.4",
+    "turndown-plugin-gfm": "^1.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.10",
+    "@types/turndown": "^5.0.6",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}

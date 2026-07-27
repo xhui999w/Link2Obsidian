@@ -1,0 +1,38 @@
+{
+  "apiVersion": "1",
+  "id": "wechat",
+  "name": "微信公众号",
+  "priority": 100,
+  "sourceTag": "微信",
+  "match": {
+    "hostnames": [
+      "mp.weixin.qq.com"
+    ]
+  },
+  "page": {
+    "waitForSelector": "#js_content",
+    "removeSelectors": [
+      "#js_pc_qr_code",
+      "#js_tags",
+      ".qr_code_pc",
+      ".rich_media_tool",
+      ".reward_area",
+      ".related_container"
+    ]
+  },
+  "extraction": {
+    "contentSelector": "#js_content",
+    "titleSelectors": [
+      "#activity-name",
+      ".rich_media_title",
+      "meta[property=\"og:title\"]"
+    ],
+    "sourceSelectors": [
+      "#js_name",
+      ".rich_media_meta_nickname",
+      "meta[name=\"author\"]",
+      "meta[property=\"og:site_name\"]"
+    ],
+    "removeHiddenElements": false
+  }
+}

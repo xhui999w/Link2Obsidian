@@ -1,0 +1,33 @@
+name: Feature request / 功能建议
+description: Suggest an improvement within the URL-to-Obsidian scope
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case / 使用场景
+      description: What URL-to-Obsidian problem should this solve? / 需要解决哪个链接转 Obsidian 问题？
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior / 建议行为
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives / 替代方案
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Project scope / 项目边界
+      options:
+        - label: This is directly related to URL → Markdown → Obsidian. / 该建议直接服务于链接转 Markdown 和 Obsidian。
+          required: true
+        - label: This is not a request for a note editor, knowledge base, or reading app. / 这不是笔记、知识库或阅读软件需求。
+          required: true
+

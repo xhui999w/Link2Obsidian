@@ -1,0 +1,37 @@
+{
+  "apiVersion": "1",
+  "id": "zhihu",
+  "name": "知乎文章",
+  "priority": 100,
+  "sourceTag": "知乎",
+  "match": {
+    "hostnames": [
+      "zhihu.com",
+      "*.zhihu.com"
+    ]
+  },
+  "page": {
+    "waitForSelector": "article, .Post-RichTextContainer, .RichText",
+    "removeSelectors": [
+      ".Comments-container",
+      ".Recommendations-Main",
+      ".ContentItem-actions",
+      ".Reward"
+    ]
+  },
+  "extraction": {
+    "contentSelector": "article, .Post-RichTextContainer, .RichText",
+    "titleSelectors": [
+      ".Post-Title",
+      "h1",
+      "meta[property=\"og:title\"]"
+    ],
+    "sourceSelectors": [
+      ".AuthorInfo-name",
+      ".UserLink-link",
+      "meta[name=\"author\"]",
+      "meta[property=\"og:site_name\"]"
+    ],
+    "removeHiddenElements": false
+  }
+}

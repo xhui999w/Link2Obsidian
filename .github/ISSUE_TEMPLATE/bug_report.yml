@@ -1,0 +1,80 @@
+name: Bug / 程序错误
+description: Report a reproducible Link2Obsidian problem / 报告可复现的问题
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。请先隐藏 URL 中的私人参数、Cookie、Token 和 API Key。
+        Thank you. Remove private URL parameters, cookies, tokens, and API keys.
+  - type: input
+    id: version
+    attributes:
+      label: Version / 版本
+      placeholder: v0.x.x, commit SHA, or main
+    validations:
+      required: true
+  - type: dropdown
+    id: architecture
+    attributes:
+      label: CPU architecture / CPU 架构
+      options:
+        - amd64 / x86_64
+        - arm64 / aarch64
+        - armv7
+        - Unknown / 不清楚
+    validations:
+      required: true
+  - type: input
+    id: nas
+    attributes:
+      label: NAS and OS / NAS 型号与系统
+      placeholder: Synology DS923+ / DSM 7.2
+    validations:
+      required: true
+  - type: input
+    id: docker
+    attributes:
+      label: Docker version
+      placeholder: Docker 26.x, Compose v2.x
+  - type: textarea
+    id: description
+    attributes:
+      label: Problem / 问题描述
+      description: What happened, and what did you expect? / 实际发生了什么，期望结果是什么？
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce / 复现步骤
+      placeholder: |
+        1. Start with...
+        2. Submit URL type...
+        3. Observe...
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / 日志
+      description: Paste `docker compose logs --tail=200 link2obsidian`. Remove secrets first.
+      render: shell
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant configuration / 相关配置
+      description: Do not include `L2O_AI_API_KEY` or private paths if they are sensitive.
+      render: shell
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist / 检查
+      options:
+        - label: I removed secrets and private content. / 我已经删除密钥和隐私内容。
+          required: true
+        - label: I searched existing issues. / 我已经搜索过现有 Issue。
+          required: true
+

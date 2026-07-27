@@ -1,0 +1,67 @@
+name: Installation help / 安装求助
+description: Docker, NAS, permission, startup, or upgrade problems
+title: "[Install]: "
+labels:
+  - installation
+body:
+  - type: dropdown
+    id: nas-platform
+    attributes:
+      label: NAS platform / NAS 平台
+      options:
+        - Synology DSM
+        - QNAP QTS / QuTS hero
+        - TrueNAS SCALE
+        - Unraid
+        - Generic Linux
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: architecture
+    attributes:
+      label: CPU architecture / CPU 架构
+      options:
+        - amd64 / x86_64
+        - arm64 / aarch64
+        - armv7
+        - Unknown / 不清楚
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Docker and Compose versions
+      placeholder: Docker 26.x, Compose v2.x
+    validations:
+      required: true
+  - type: textarea
+    id: commands
+    attributes:
+      label: Commands used / 执行过的命令
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Current result / 当前结果
+      description: Include container state and the exact error.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Container logs / 容器日志
+      description: Remove tokens, API keys, and private paths.
+      render: shell
+  - type: checkboxes
+    id: docs
+    attributes:
+      label: Documentation / 文档
+      options:
+        - label: I followed the Docker or NAS installation guide. / 我已经按照 Docker 或 NAS 教程操作。
+          required: true
+        - label: I removed secrets from this issue. / 我已经删除密钥。
+          required: true
+
