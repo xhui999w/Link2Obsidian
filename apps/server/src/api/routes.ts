@@ -3,6 +3,7 @@ import type { FastifyInstance } from "fastify";
 import type { ClipService } from "../application/clip-service.js";
 import type { AppConfig } from "../config/env.js";
 import type { PluginRegistry } from "../domain/clip.js";
+import { renderHomePage } from "../web/home-page.js";
 
 export async function registerRoutes(
   app: FastifyInstance,
@@ -10,14 +11,11 @@ export async function registerRoutes(
   clipService: ClipService,
   pluginRegistry: PluginRegistry,
 ): Promise<void> {
-  app.get("/", async () => ({
-    name: "Link2Obsidian",
-    description: "Turn web links into Markdown files for an Obsidian vault.",
-    version: "0.1.0",
-    status: "mvp",
-    health: "/health",
-    clips: "POST /api/clips",
-  }));
+  app.get("/", async (_request, reply) => {
+    return reply
+      .type("text/html; charset=utf-8")
+      .send(renderHomePage());
+  });
 
   app.get("/health", async () => ({
     status: "ok",
