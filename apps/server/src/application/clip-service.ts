@@ -1,9 +1,7 @@
-import { createHash, randomUUID } from "node:crypto";
+import { createHash } from "node:crypto";
 import {
-  link,
   mkdir,
   readdir,
-  unlink,
   writeFile,
 } from "node:fs/promises";
 import { isAbsolute, relative, resolve, sep } from "node:path";
@@ -145,11 +143,11 @@ export class ClipService {
       body,
     });
 
-    const temporary = resolve(outputDirectory, `.${filename}.${randomUUID()}.tmp`);
-    await writeFile(temporary, markdown, "utf8");
-
     try {
-      await link(temporary, destination);
+      await writeFile(destination, markdown, {
+        encoding: "utf8",
+        flag: "wx",
+      });
     } catch (error) {
       if (isAlreadyExists(error)) {
         return {
@@ -167,8 +165,6 @@ export class ClipService {
         };
       }
       throw error;
-    } finally {
-      await unlink(temporary).catch(() => undefined);
     }
 
     return {
@@ -224,8 +220,23 @@ export function safeFilename(title: string): string {
     .replace(/\s+/g, " ")
     .replace(/[.\s]+$/g, "")
     .trim();
-  const characters = Array.from(cleaned || "Untitled").slice(0, 100);
-  return characters.join("");
+  return truncateUtf8(cleaned || "Untitled", 180);
+}
+
+function truncateUtf8(value: string, maxBytes: number): string {
+  let result = "";
+  let bytes = 0;
+
+  for (const character of value) {
+    const characterBytes = Buffer.byteLength(character, "utf8");
+    if (bytes + characterBytes > maxBytes) {
+      break;
+    }
+    result += character;
+    bytes += characterBytes;
+  }
+
+  return result;
 }
 
 function urlHash(url: string): string {
