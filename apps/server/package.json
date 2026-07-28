@@ -16,6 +16,7 @@
     "@link2obsidian/plugin-api": "0.1.0",
     "defuddle": "^0.19.2",
     "fastify": "^5.2.1",
+    "heic-convert": "^2.1.0",
     "linkedom": "^0.18.13",
     "playwright": "^1.62.0",
     "turndown": "^7.2.4",

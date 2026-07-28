@@ -75,6 +75,45 @@ test("localizes images, reuses duplicate content, and keeps failed images remote
   }
 });
 
+test("converts HEIC images to Obsidian-compatible JPEG files", async () => {
+  const vaultPath = await mkdtemp(join(tmpdir(), "link2obsidian-heic-"));
+  const jpegBytes = Buffer.from([255, 216, 255, 224]);
+  const fetchImage = (async () => new Response(
+    new Uint8Array([0, 0, 0, 28, 102, 116, 121, 112, 104, 101, 105, 99]),
+    {
+      status: 200,
+      headers: {
+        "content-type": "image/heic",
+      },
+    },
+  )) as typeof fetch;
+  const convertHeic = async () => jpegBytes;
+  const localizer = new HttpImageLocalizer(
+    createConfig(vaultPath),
+    fetchImage,
+    convertHeic,
+  );
+
+  try {
+    const result = await localizer.localize({
+      html: '<article><img src="https://p3-sign.toutiaoimg.com/photo.image"></article>',
+      pageUrl: "https://www.toutiao.com/article/123",
+      noteBasename: "头条图片--abc123",
+    });
+
+    assert.equal(result.downloaded, 1);
+    assert.equal(result.failed, 0);
+    assert.deepEqual(
+      await readFile(
+        join(vaultPath, "Attachments", "头条图片--abc123", "image001.jpg"),
+      ),
+      jpegBytes,
+    );
+  } finally {
+    await rm(vaultPath, { recursive: true, force: true });
+  }
+});
+
 function createConfig(vaultPath: string): AppConfig {
   return {
     server: {

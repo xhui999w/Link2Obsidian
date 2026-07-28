@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import { extname, isAbsolute, relative, resolve, sep } from "node:path";
 
+import convertHeic from "heic-convert";
 import { parseHTML } from "linkedom";
 
 import type { AppConfig } from "../config/env.js";
@@ -27,10 +28,17 @@ const URL_EXTENSIONS = new Set([
   ".webp",
 ]);
 
+type HeicConverter = (input: {
+  buffer: Buffer;
+  format: "JPEG";
+  quality: number;
+}) => Promise<Buffer>;
+
 export class HttpImageLocalizer implements ImageLocalizer {
   constructor(
     private readonly config: AppConfig,
     private readonly fetchImage: typeof fetch = globalThis.fetch,
+    private readonly heicConverter: HeicConverter = convertHeic,
   ) {}
 
   async localize(input: {
@@ -131,14 +139,26 @@ export class HttpImageLocalizer implements ImageLocalizer {
       ?.split(";", 1)[0]
       ?.trim()
       .toLowerCase();
+    let bytes = new Uint8Array(await response.arrayBuffer());
+    if (bytes.byteLength > this.config.runtime.maxImageBytes) {
+      throw new Error("Image exceeds the configured size limit");
+    }
+
+    if (contentType === "image/heic" || contentType === "image/heif") {
+      bytes = new Uint8Array(await this.heicConverter({
+        buffer: Buffer.from(bytes),
+        format: "JPEG",
+        quality: 0.9,
+      }));
+      if (bytes.byteLength > this.config.runtime.maxImageBytes) {
+        throw new Error("Converted image exceeds the configured size limit");
+      }
+      return { bytes, extension: ".jpg" };
+    }
+
     const extension = extensionFor(contentType, response.url || url);
     if (!extension) {
       throw new Error("Response is not a supported image");
-    }
-
-    const bytes = new Uint8Array(await response.arrayBuffer());
-    if (bytes.byteLength > this.config.runtime.maxImageBytes) {
-      throw new Error("Image exceeds the configured size limit");
     }
 
     return { bytes, extension };
