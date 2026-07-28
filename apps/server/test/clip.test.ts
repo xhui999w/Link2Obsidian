@@ -6,6 +6,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { buildApp } from "../src/app.js";
+import { safeFilename } from "../src/application/clip-service.js";
 import type { AppConfig } from "../src/config/env.js";
 import type {
   ArticleClassifier,
@@ -17,6 +18,14 @@ import type {
 } from "../src/domain/clip.js";
 import type { SitePluginManifest } from "@link2obsidian/plugin-api";
 import type { AiEnhancer } from "../src/ai/types.js";
+
+test("safeFilename keeps UTF-8 filenames within NAS filesystem limits", () => {
+  const filename = safeFilename("这是一个很长的中文标题".repeat(30));
+
+  assert.ok(Buffer.byteLength(filename, "utf8") <= 180);
+  assert.ok(filename.length > 0);
+  assert.doesNotMatch(filename, /\uFFFD/);
+});
 
 class FakePageLoader implements PageLoader {
   calls = 0;
