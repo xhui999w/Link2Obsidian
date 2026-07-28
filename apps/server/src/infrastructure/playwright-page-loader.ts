@@ -1,4 +1,4 @@
-import { chromium, type Browser } from "playwright";
+import { chromium, type Browser, type Page } from "playwright";
 import type { SitePluginManifest } from "@link2obsidian/plugin-api";
 
 import type { AppConfig } from "../config/env.js";
@@ -44,15 +44,17 @@ export class PlaywrightPageLoader implements PageLoader {
       }
 
       if (plugin.page?.removeSelectors?.length) {
-        await page.evaluate((selectors) => {
-          for (const selector of selectors) {
-            document.querySelectorAll(selector).forEach((element) => element.remove());
-          }
-        }, plugin.page.removeSelectors);
+        await withStablePage(page, async () => {
+          await page.evaluate((selectors) => {
+            for (const selector of selectors) {
+              document.querySelectorAll(selector).forEach((element) => element.remove());
+            }
+          }, plugin.page?.removeSelectors ?? []);
+        });
       }
 
       return {
-        html: await page.content(),
+        html: await withStablePage(page, () => page.content()),
         finalUrl: page.url(),
       };
     } catch (error) {
@@ -81,4 +83,40 @@ export class PlaywrightPageLoader implements PageLoader {
 
     return this.browser;
   }
+}
+
+export async function withStablePage<T>(
+  page: Page,
+  operation: () => Promise<T>,
+): Promise<T> {
+  const attempts = 3;
+
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    await page.waitForLoadState("domcontentloaded", {
+      timeout: 5_000,
+    }).catch(() => undefined);
+
+    try {
+      return await operation();
+    } catch (error) {
+      if (!isNavigationRace(error) || attempt === attempts) {
+        throw error;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+  }
+
+  throw new Error("Page did not become stable");
+}
+
+function isNavigationRace(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return (
+    error.message.includes("Execution context was destroyed")
+    || error.message.includes("Cannot find context with specified id")
+    || error.message.includes("Target page, context or browser has been closed")
+  );
 }
