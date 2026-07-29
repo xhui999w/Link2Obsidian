@@ -30,7 +30,9 @@ export class DefuddleArticleExtractor implements ArticleExtractor {
       document,
       plugin.extraction?.titleSelectors,
     ) || (result.title ?? "").trim();
-    const html = (result.content ?? "").trim();
+    const html = plugin.extraction?.openGraphContent
+      ? openGraphContent(document)
+      : (result.content ?? "").trim();
     const hostname = new URL(page.finalUrl).hostname.replace(/^www\./, "");
     const source = firstSelectorValue(
       document,
@@ -53,6 +55,32 @@ export class DefuddleArticleExtractor implements ArticleExtractor {
       html,
     };
   }
+}
+
+function openGraphContent(document: Document): string {
+  const description = document
+    .querySelector('meta[property="og:description"]')
+    ?.getAttribute("content")
+    ?.trim();
+  const imageUrls = Array.from(
+    document.querySelectorAll('meta[property="og:image"]'),
+  ).map((element) => element.getAttribute("content")?.trim())
+    .filter((value): value is string => Boolean(value));
+  const container = document.createElement("div");
+
+  for (const imageUrl of [...new Set(imageUrls)]) {
+    const image = document.createElement("img");
+    image.setAttribute("src", imageUrl);
+    container.append(image);
+  }
+
+  if (description) {
+    const paragraph = document.createElement("p");
+    paragraph.textContent = description;
+    container.append(paragraph);
+  }
+
+  return container.innerHTML.trim();
 }
 
 function firstSelectorValue(

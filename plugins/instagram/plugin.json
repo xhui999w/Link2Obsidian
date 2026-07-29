@@ -1,0 +1,34 @@
+{
+  "apiVersion": "1",
+  "id": "instagram",
+  "name": "Instagram",
+  "priority": 100,
+  "sourceTag": "Instagram",
+  "match": {
+    "hostnames": [
+      "instagram.com",
+      "www.instagram.com"
+    ],
+    "pathPrefixes": [
+      "/p/",
+      "/reel/",
+      "/reels/"
+    ]
+  },
+  "page": {
+    "useProxy": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
+    "waitForSelector": "main"
+  },
+  "extraction": {
+    "openGraphContent": true,
+    "titleSelectors": [
+      "meta[property=\"og:title\"]",
+      "meta[name=\"twitter:title\"]"
+    ],
+    "sourceSelectors": [
+      "meta[property=\"og:site_name\"]"
+    ],
+    "removeHiddenElements": false
+  }
+}

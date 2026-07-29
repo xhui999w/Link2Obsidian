@@ -47,6 +47,7 @@ docker compose up -d
 | `L2O_LANGUAGE` | `zh-CN` | Chromium 和提取器语言 |
 | `L2O_WORKER_CONCURRENCY` | `1` | 预留并发数 |
 | `L2O_PAGE_TIMEOUT_MS` | `30000` | 页面加载超时 |
+| `L2O_PROXY_SERVER` | 空 | 可选 HTTP/SOCKS 代理，仅供声明需要代理的网站插件使用 |
 | `L2O_IMAGE_TIMEOUT_MS` | `15000` | 单张图片下载超时 |
 | `L2O_MAX_IMAGES` | `100` | 单篇文章最大图片数量 |
 | `L2O_MAX_IMAGE_BYTES` | `20971520` | 单张图片最大字节数，默认 20 MB |
@@ -79,4 +80,3 @@ L2O_AI_ENABLED=false
 ```
 
 建议先用最小配置验证采集，再启用 AI 或调整超时。
-

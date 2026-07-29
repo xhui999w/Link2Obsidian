@@ -47,6 +47,7 @@ Output and attachment paths must remain relative to the Vault.
 | `L2O_LANGUAGE` | `zh-CN` | Browser and extractor language |
 | `L2O_WORKER_CONCURRENCY` | `1` | Reserved worker concurrency |
 | `L2O_PAGE_TIMEOUT_MS` | `30000` | Page navigation timeout |
+| `L2O_PROXY_SERVER` | empty | Optional HTTP/SOCKS proxy, used only by site plugins that opt in |
 | `L2O_IMAGE_TIMEOUT_MS` | `15000` | Timeout per image |
 | `L2O_MAX_IMAGES` | `100` | Maximum images per article |
 | `L2O_MAX_IMAGE_BYTES` | `20971520` | Maximum bytes per image |
@@ -67,4 +68,3 @@ Output and attachment paths must remain relative to the Vault.
 
 AI is off by default. A cloud provider receives the title, source, and a
 limited amount of article text. See [AI enhancement](ai.md).
-

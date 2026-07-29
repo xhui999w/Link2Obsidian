@@ -29,6 +29,7 @@ export interface AppConfig {
     maxImageBytes: number;
     duplicatePolicy: DuplicatePolicy;
     defaultCategory: string;
+    proxyServer?: string;
   };
   ai: {
     enabled: boolean;
@@ -120,6 +121,7 @@ export function loadConfig(): AppConfig {
         "skip",
         ["overwrite", "skip", "suffix"] as const,
       ),
+      proxyServer: process.env.L2O_PROXY_SERVER,
       defaultCategory: process.env.L2O_DEFAULT_CATEGORY ?? "生活经验",
     },
     ai: {

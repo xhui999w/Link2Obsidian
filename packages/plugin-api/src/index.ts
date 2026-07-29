@@ -13,12 +13,14 @@ export interface SitePluginManifest {
   };
   page?: {
     javaScriptEnabled?: boolean;
+    useProxy?: boolean;
     userAgent?: string;
     waitForSelector?: string;
     removeSelectors?: string[];
   };
   extraction?: {
     contentSelector?: string;
+    openGraphContent?: boolean;
     titleSelectors?: string[];
     sourceSelectors?: string[];
     removeHiddenElements?: boolean;
