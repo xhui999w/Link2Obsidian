@@ -150,12 +150,12 @@ test("POST /api/clips saves Obsidian Markdown and skips duplicate URLs", async (
       "utf8",
     );
     assert.match(markdown, /^---\n/);
-    assert.match(markdown, /title: "中文网页标题：测试"/);
-    assert.match(markdown, /source: "示例网站"/);
-    assert.match(markdown, /url: "https:\/\/example\.com\/中文\?id=1#section"/);
-    assert.match(markdown, /created: \d{4}-\d{2}-\d{2}T/);
-    assert.match(markdown, /category: "健康养生"/);
-    assert.match(markdown, /tags: \["健康","睡眠","头条"\]/);
+    assert.match(markdown, /标题: "中文网页标题：测试"/);
+    assert.match(markdown, /来源: "示例网站"/);
+    assert.match(markdown, /原文链接: "https:\/\/example\.com\/中文\?id=1#section"/);
+    assert.match(markdown, /收藏时间: \d{4}-\d{2}-\d{2}T/);
+    assert.match(markdown, /分类: "健康养生"/);
+    assert.match(markdown, /标签: \["健康","睡眠","头条"\]/);
     assert.match(markdown, /<!-- link2obsidian-id: [a-f0-9]{10} -->/);
     assert.match(markdown, /这是正文。/);
 
@@ -214,8 +214,8 @@ test("AI enhancement can override suggestions without changing article content",
     assert.match(result.file, /^Clippings\/AI人工智能\//);
 
     const markdown = await readFile(join(vaultPath, result.file), "utf8");
-    assert.match(markdown, /summary: "这是一段自动生成的摘要。"/);
-    assert.match(markdown, /keywords: \["大模型","知识整理"\]/);
+    assert.match(markdown, /摘要: "这是一段自动生成的摘要。"/);
+    assert.match(markdown, /关键词: \["大模型","知识整理"\]/);
     assert.match(markdown, /这是正文。/);
   } finally {
     await app.close();

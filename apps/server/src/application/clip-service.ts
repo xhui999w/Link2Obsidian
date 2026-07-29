@@ -304,7 +304,9 @@ async function fileContainsClipId(path: string, hash: string): Promise<boolean> 
       return true;
     }
 
-    const urlValue = header.match(/^url:\s*(.+)$/m)?.[1]?.trim();
+    const urlValue = header
+      .match(/^(?:url|原文链接):\s*(.+)$/m)?.[1]
+      ?.trim();
     if (!urlValue) {
       return false;
     }
@@ -357,16 +359,16 @@ function renderMarkdown(input: {
 }): string {
   return [
     "---",
-    `title: ${yamlString(input.title)}`,
-    `source: ${yamlString(input.source)}`,
-    `url: ${yamlString(input.url)}`,
-    `created: ${input.created}`,
-    `category: ${yamlString(input.category)}`,
-    ...(input.summary ? [`summary: ${yamlString(input.summary)}`] : []),
+    `标题: ${yamlString(input.title)}`,
+    `来源: ${yamlString(input.source)}`,
+    `原文链接: ${yamlString(input.url)}`,
+    `收藏时间: ${input.created}`,
+    `分类: ${yamlString(input.category)}`,
+    ...(input.summary ? [`摘要: ${yamlString(input.summary)}`] : []),
     ...(input.keywords?.length
-      ? [`keywords: ${JSON.stringify(input.keywords)}`]
+      ? [`关键词: ${JSON.stringify(input.keywords)}`]
       : []),
-    `tags: ${JSON.stringify(input.tags)}`,
+    `标签: ${JSON.stringify(input.tags)}`,
     "---",
     `<!-- link2obsidian-id: ${input.key} -->`,
     "",
