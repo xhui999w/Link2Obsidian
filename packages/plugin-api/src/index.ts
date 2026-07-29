@@ -13,6 +13,7 @@ export interface SitePluginManifest {
   };
   page?: {
     javaScriptEnabled?: boolean;
+    userAgent?: string;
     waitForSelector?: string;
     removeSelectors?: string[];
   };

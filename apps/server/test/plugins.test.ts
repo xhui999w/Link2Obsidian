@@ -36,6 +36,7 @@ test("wechat plugin uses site-specific title, source, and content selectors", as
   const registry = await FileSitePluginRegistry.load(pluginsPath);
   const plugin = registry.select("https://mp.weixin.qq.com/s/example");
   assert.equal(plugin.page?.javaScriptEnabled, false);
+  assert.match(plugin.page?.userAgent ?? "", /Chrome\/132/);
   const extractor = new DefuddleArticleExtractor("zh-CN");
   const article = await extractor.extract(
     {

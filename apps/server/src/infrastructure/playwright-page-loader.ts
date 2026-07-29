@@ -16,6 +16,7 @@ export class PlaywrightPageLoader implements PageLoader {
       locale: this.config.runtime.language,
       timezoneId: this.config.runtime.timezone,
       javaScriptEnabled: plugin.page?.javaScriptEnabled ?? true,
+      userAgent: plugin.page?.userAgent,
     });
 
     try {
