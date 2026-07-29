@@ -4,6 +4,7 @@ import { extname, isAbsolute, relative, resolve, sep } from "node:path";
 
 import convertHeic from "heic-convert";
 import { parseHTML } from "linkedom";
+import { fetch as undiciFetch, ProxyAgent } from "undici";
 
 import type { AppConfig } from "../config/env.js";
 import type { ImageLocalizer, LocalizedArticle } from "../domain/clip.js";
@@ -34,17 +35,29 @@ type HeicConverter = (input: {
   quality: number;
 }) => Promise<Buffer>;
 
+type ImageFetch = (
+  input: string,
+  init?: RequestInit & { dispatcher?: ProxyAgent },
+) => Promise<Response>;
+
 export class HttpImageLocalizer implements ImageLocalizer {
+  private readonly proxyAgent?: ProxyAgent;
+
   constructor(
     private readonly config: AppConfig,
-    private readonly fetchImage: typeof fetch = globalThis.fetch,
+    private readonly fetchImage: ImageFetch = undiciFetch as ImageFetch,
     private readonly heicConverter: HeicConverter = convertHeic,
-  ) {}
+  ) {
+    this.proxyAgent = config.runtime.proxyServer
+      ? new ProxyAgent(config.runtime.proxyServer)
+      : undefined;
+  }
 
   async localize(input: {
     html: string;
     pageUrl: string;
     noteBasename: string;
+    useProxy?: boolean;
   }): Promise<LocalizedArticle> {
     const { document } = parseHTML(`<html><body>${input.html}</body></html>`);
     const images = Array.from(document.querySelectorAll("img"))
@@ -76,7 +89,7 @@ export class HttpImageLocalizer implements ImageLocalizer {
       }
 
       try {
-        const asset = await this.download(source, input.pageUrl);
+        const asset = await this.download(source, input.pageUrl, input.useProxy);
         const contentHash = createHash("sha256").update(asset.bytes).digest("hex");
         const duplicatePath = contentPaths.get(contentHash);
 
@@ -110,6 +123,7 @@ export class HttpImageLocalizer implements ImageLocalizer {
   private async download(
     url: string,
     pageUrl: string,
+    useProxy = false,
   ): Promise<{ bytes: Uint8Array; extension: string }> {
     const response = await this.fetchImage(url, {
       headers: {
@@ -118,6 +132,7 @@ export class HttpImageLocalizer implements ImageLocalizer {
       },
       redirect: "follow",
       signal: AbortSignal.timeout(this.config.runtime.imageTimeoutMs),
+      dispatcher: useProxy ? this.proxyAgent : undefined,
     });
 
     if (!response.ok) {

@@ -129,6 +129,7 @@ export class ClipService {
       html: article.html,
       pageUrl: page.finalUrl,
       noteBasename,
+      useProxy: extractionPlugin.page?.useProxy,
     });
     const body = this.markdownConverter.convert(localized.html);
     const markdown = renderMarkdown({

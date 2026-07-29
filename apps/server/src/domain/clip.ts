@@ -57,6 +57,7 @@ export interface ImageLocalizer {
     html: string;
     pageUrl: string;
     noteBasename: string;
+    useProxy?: boolean;
   }): Promise<LocalizedArticle>;
 }
 
