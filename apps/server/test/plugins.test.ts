@@ -35,6 +35,7 @@ test("selects Chinese site plugins and falls back to general", async () => {
 test("wechat plugin uses site-specific title, source, and content selectors", async () => {
   const registry = await FileSitePluginRegistry.load(pluginsPath);
   const plugin = registry.select("https://mp.weixin.qq.com/s/example");
+  assert.equal(plugin.page?.javaScriptEnabled, false);
   const extractor = new DefuddleArticleExtractor("zh-CN");
   const article = await extractor.extract(
     {

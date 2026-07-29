@@ -10,6 +10,7 @@
     ]
   },
   "page": {
+    "javaScriptEnabled": false,
     "waitForSelector": "#js_content",
     "removeSelectors": [
       "#js_pc_qr_code",

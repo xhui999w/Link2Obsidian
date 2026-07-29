@@ -15,6 +15,7 @@ export class PlaywrightPageLoader implements PageLoader {
     const context = await browser.newContext({
       locale: this.config.runtime.language,
       timezoneId: this.config.runtime.timezone,
+      javaScriptEnabled: plugin.page?.javaScriptEnabled ?? true,
     });
 
     try {

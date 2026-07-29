@@ -12,6 +12,7 @@ export interface SitePluginManifest {
     pathPrefixes?: string[];
   };
   page?: {
+    javaScriptEnabled?: boolean;
     waitForSelector?: string;
     removeSelectors?: string[];
   };
