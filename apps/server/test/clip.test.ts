@@ -143,7 +143,7 @@ test("POST /api/clips saves Obsidian Markdown and skips duplicate URLs", async (
 
     const files = await readdir(join(vaultPath, "Clippings", "健康养生"));
     assert.equal(files.length, 1);
-    assert.match(files[0] ?? "", /^中文网页标题：测试--[a-f0-9]{10}\.md$/);
+    assert.equal(files[0], "中文网页标题：测试.md");
 
     const markdown = await readFile(
       join(vaultPath, "Clippings", "健康养生", files[0] ?? ""),
@@ -156,6 +156,7 @@ test("POST /api/clips saves Obsidian Markdown and skips duplicate URLs", async (
     assert.match(markdown, /created: \d{4}-\d{2}-\d{2}T/);
     assert.match(markdown, /category: "健康养生"/);
     assert.match(markdown, /tags: \["健康","睡眠","头条"\]/);
+    assert.match(markdown, /<!-- link2obsidian-id: [a-f0-9]{10} -->/);
     assert.match(markdown, /这是正文。/);
 
     const duplicate = await app.inject({
@@ -169,6 +170,18 @@ test("POST /api/clips saves Obsidian Markdown and skips duplicate URLs", async (
     assert.equal(duplicate.statusCode, 200);
     assert.equal(duplicate.json().status, "duplicate");
     assert.equal(loader.calls, 1);
+
+    const sameTitle = await app.inject({
+      method: "POST",
+      url: "/api/clips",
+      payload: {
+        url: "https://example.com/另一篇文章?id=2",
+      },
+    });
+
+    assert.equal(sameTitle.statusCode, 201);
+    assert.equal(sameTitle.json().status, "saved");
+    assert.match(sameTitle.json().file, /中文网页标题：测试 \(2\)\.md$/);
   } finally {
     await app.close();
     await rm(vaultPath, { recursive: true, force: true });

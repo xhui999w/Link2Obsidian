@@ -1,6 +1,8 @@
 import { createHash } from "node:crypto";
 import {
+  access,
   mkdir,
+  open,
   readdir,
   writeFile,
 } from "node:fs/promises";
@@ -122,13 +124,13 @@ export class ClipService {
       category,
     );
     await mkdir(outputDirectory, { recursive: true });
-    const noteBasename = `${safeFilename(article.title)}--${key}`;
-    const filename = `${noteBasename}.md`;
-    const destination = resolve(outputDirectory, filename);
+    const visibleBasename = safeFilename(article.title);
+    const attachmentBasename = `${visibleBasename}--${key}`;
+    const destination = await availableNotePath(outputDirectory, visibleBasename);
     const localized = await this.imageLocalizer.localize({
       html: article.html,
       pageUrl: page.finalUrl,
-      noteBasename,
+      noteBasename: attachmentBasename,
       useProxy: extractionPlugin.page?.useProxy,
     });
     const body = this.markdownConverter.convert(localized.html);
@@ -142,6 +144,7 @@ export class ClipService {
       summary,
       keywords,
       body,
+      key,
     });
 
     try {
@@ -276,8 +279,10 @@ async function findExistingFile(
   const entries = await readdir(outputDirectory, { withFileTypes: true });
   for (const entry of entries) {
     const path = resolve(outputDirectory, entry.name);
-    if (entry.isFile() && entry.name.endsWith(suffix)) {
-      return path;
+    if (entry.isFile() && entry.name.endsWith(".md")) {
+      if (entry.name.endsWith(suffix) || await fileContainsClipId(path, hash)) {
+        return path;
+      }
     }
     if (entry.isDirectory()) {
       const nested = await findExistingFile(path, hash);
@@ -287,6 +292,40 @@ async function findExistingFile(
     }
   }
   return undefined;
+}
+
+async function fileContainsClipId(path: string, hash: string): Promise<boolean> {
+  const handle = await open(path, "r");
+  try {
+    const buffer = Buffer.alloc(4_096);
+    const { bytesRead } = await handle.read(buffer, 0, buffer.length, 0);
+    return buffer.subarray(0, bytesRead)
+      .toString("utf8")
+      .includes(`<!-- link2obsidian-id: ${hash} -->`);
+  } finally {
+    await handle.close();
+  }
+}
+
+async function availableNotePath(
+  directory: string,
+  basename: string,
+): Promise<string> {
+  for (let number = 1; number < 10_000; number += 1) {
+    const suffix = number === 1 ? "" : ` (${number})`;
+    const candidate = resolve(directory, `${basename}${suffix}.md`);
+    try {
+      await access(candidate);
+    } catch {
+      return candidate;
+    }
+  }
+
+  throw new ClipError(
+    "FILENAME_EXHAUSTED",
+    "Could not find an available filename for this article",
+    500,
+  );
 }
 
 function renderMarkdown(input: {
@@ -299,6 +338,7 @@ function renderMarkdown(input: {
   summary?: string;
   keywords?: string[];
   body: string;
+  key: string;
 }): string {
   return [
     "---",
@@ -313,6 +353,7 @@ function renderMarkdown(input: {
       : []),
     `tags: ${JSON.stringify(input.tags)}`,
     "---",
+    `<!-- link2obsidian-id: ${input.key} -->`,
     "",
     input.body.trim(),
     "",
