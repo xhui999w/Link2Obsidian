@@ -69,3 +69,41 @@ test("wechat plugin uses site-specific title, source, and content selectors", as
   assert.match(article.html, /第一段正文/);
   assert.doesNotMatch(article.html, /不应作为正文的导航信息/);
 });
+
+test("instagram plugin extracts every image from a carousel payload", async () => {
+  const registry = await FileSitePluginRegistry.load(pluginsPath);
+  const plugin = registry.select("https://www.instagram.com/p/carousel123/");
+  const extractor = new DefuddleArticleExtractor("zh-CN");
+  const article = await extractor.extract(
+    {
+      finalUrl: "https://www.instagram.com/p/carousel123/",
+      html: [
+        "<!doctype html><html><head>",
+        '<meta property="og:title" content="Carousel example">',
+        '<meta property="og:site_name" content="Instagram">',
+        '<meta property="og:url" content="https://www.instagram.com/user/p/carousel123/">',
+        '<meta property="og:description" content="Nine photos">',
+        '<meta property="og:image" content="https://cdn.example/cover.jpg">',
+        "</head><body>",
+        '<script type="application/json">',
+        JSON.stringify({
+          data: {
+            code: "carousel123",
+            if_not_gated_logged_out: {
+              carousel_media: [
+                { display_uri: "https://cdn.example/one.jpg" },
+                { display_uri: "https://cdn.example/two.jpg" },
+              ],
+            },
+          },
+        }),
+        "</script></body></html>",
+      ].join(""),
+    },
+    plugin,
+  );
+
+  assert.match(article.html, /https:\/\/cdn\.example\/one\.jpg/);
+  assert.match(article.html, /https:\/\/cdn\.example\/two\.jpg/);
+  assert.doesNotMatch(article.html, /https:\/\/cdn\.example\/cover\.jpg/);
+});
