@@ -1,0 +1,35 @@
+{
+  "apiVersion": "1",
+  "id": "x",
+  "name": "X (Twitter)",
+  "priority": 100,
+  "sourceTag": "X",
+  "match": {
+    "hostnames": [
+      "x.com",
+      "www.x.com",
+      "twitter.com",
+      "www.twitter.com"
+    ],
+    "pathPrefixes": [
+      "/"
+    ]
+  },
+  "page": {
+    "javaScriptEnabled": false,
+    "useProxy": true,
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36",
+    "waitForSelector": "meta[property=\"og:title\"]"
+  },
+  "extraction": {
+    "openGraphContent": true,
+    "titleSelectors": [
+      "meta[property=\"og:title\"]",
+      "meta[name=\"twitter:title\"]"
+    ],
+    "sourceSelectors": [
+      "meta[property=\"og:site_name\"]"
+    ],
+    "removeHiddenElements": false
+  }
+}

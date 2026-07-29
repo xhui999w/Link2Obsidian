@@ -31,12 +31,20 @@ test("selects Chinese site plugins and falls back to general", async () => {
     true,
   );
   assert.equal(
+    registry.select("https://x.com/example/status/123").id,
+    "x",
+  );
+  assert.equal(
+    registry.select("https://twitter.com/example/status/123").page?.useProxy,
+    true,
+  );
+  assert.equal(
     registry.select("https://example.com/article").id,
     "general",
   );
   assert.deepEqual(
     registry.list().map((plugin) => plugin.id).sort(),
-    ["general", "instagram", "toutiao", "wechat", "zhihu"],
+    ["general", "instagram", "toutiao", "wechat", "x", "zhihu"],
   );
 });
 
