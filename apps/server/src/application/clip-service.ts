@@ -299,9 +299,24 @@ async function fileContainsClipId(path: string, hash: string): Promise<boolean> 
   try {
     const buffer = Buffer.alloc(4_096);
     const { bytesRead } = await handle.read(buffer, 0, buffer.length, 0);
-    return buffer.subarray(0, bytesRead)
-      .toString("utf8")
-      .includes(`<!-- link2obsidian-id: ${hash} -->`);
+    const header = buffer.subarray(0, bytesRead).toString("utf8");
+    if (header.includes(`<!-- link2obsidian-id: ${hash} -->`)) {
+      return true;
+    }
+
+    const urlValue = header.match(/^url:\s*(.+)$/m)?.[1]?.trim();
+    if (!urlValue) {
+      return false;
+    }
+
+    try {
+      const url = urlValue.startsWith('"')
+        ? JSON.parse(urlValue) as string
+        : urlValue;
+      return urlHash(normalizeUrl(url)) === hash;
+    } catch {
+      return false;
+    }
   } finally {
     await handle.close();
   }
