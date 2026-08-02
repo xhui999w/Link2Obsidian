@@ -39,7 +39,8 @@ export class ClipService {
   ) {}
 
   async clip(inputUrl: string): Promise<ClipResult> {
-    const normalizedUrl = normalizeUrl(inputUrl);
+    const extractedUrl = extractUrlFromText(inputUrl);
+    const normalizedUrl = normalizeUrl(extractedUrl);
     const key = urlHash(normalizedUrl);
     const current = this.active.get(key);
 
@@ -47,7 +48,7 @@ export class ClipService {
       return current;
     }
 
-    const task = this.execute(inputUrl, normalizedUrl, key).finally(() => {
+    const task = this.execute(extractedUrl, normalizedUrl, key).finally(() => {
       this.active.delete(key);
     });
     this.active.set(key, task);
@@ -189,6 +190,15 @@ export class ClipService {
       },
     };
   }
+}
+
+export function extractUrlFromText(input: string): string {
+  const match = input.match(/https?:\/\/[^\s<>"'`]+/iu);
+  if (!match) {
+    throw new ClipError("INVALID_URL", "未找到有效的网页链接", 400);
+  }
+
+  return match[0].replace(/[),.;!?，。；！？」』】）》》]+$/u, "");
 }
 
 export function normalizeUrl(input: string): string {

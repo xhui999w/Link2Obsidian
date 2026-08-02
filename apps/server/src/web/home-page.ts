@@ -96,10 +96,10 @@ export function renderHomePage(): string {
       font-weight: 750;
     }
 
-    input {
+    textarea {
       width: 100%;
-      min-height: 56px;
-      padding: 0 16px;
+      min-height: 118px;
+      padding: 15px 16px;
       border: 1px solid var(--line);
       border-radius: 15px;
       outline: none;
@@ -107,10 +107,12 @@ export function renderHomePage(): string {
       background: rgba(255, 255, 255, 0.84);
       font: inherit;
       font-size: 16px;
+      line-height: 1.55;
+      resize: vertical;
       transition: border-color 160ms, box-shadow 160ms;
     }
 
-    input:focus {
+    textarea:focus {
       border-color: rgba(103, 80, 164, 0.58);
       box-shadow: 0 0 0 4px rgba(103, 80, 164, 0.11);
     }
@@ -229,18 +231,16 @@ export function renderHomePage(): string {
 
     <section class="card" aria-labelledby="clip-title">
       <form id="clip-form">
-        <label id="clip-title" for="url">网页链接</label>
-        <input
+        <label id="clip-title" for="url">链接或分享口令</label>
+        <textarea
           id="url"
           name="url"
-          type="url"
           inputmode="url"
-          autocomplete="url"
           autocapitalize="none"
           spellcheck="false"
-          placeholder="https://example.com/article"
+          placeholder="粘贴网页链接，或直接粘贴今日头条等平台的整段分享文字"
           required
-        >
+        ></textarea>
         <button id="submit" type="submit">保存到 Obsidian</button>
         <p class="hint">保存通常需要几秒到几十秒。关闭 AI 不影响正文和图片采集。</p>
       </form>

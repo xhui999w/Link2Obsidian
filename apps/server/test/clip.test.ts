@@ -6,7 +6,10 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import { buildApp } from "../src/app.js";
-import { safeFilename } from "../src/application/clip-service.js";
+import {
+  extractUrlFromText,
+  safeFilename,
+} from "../src/application/clip-service.js";
 import type { AppConfig } from "../src/config/env.js";
 import type {
   ArticleClassifier,
@@ -25,6 +28,19 @@ test("safeFilename keeps UTF-8 filenames within NAS filesystem limits", () => {
   assert.ok(Buffer.byteLength(filename, "utf8") <= 180);
   assert.ok(filename.length > 0);
   assert.doesNotMatch(filename, /\uFFFD/);
+});
+
+test("extracts the first valid URL from a pasted share message", () => {
+  assert.equal(
+    extractUrlFromText(
+      "【文章标题】点击链接打开👉 https://m.toutiao.com/is/AC95ndR4aFk/ AC95ndR4aFk` Axw:/ W@m.DH :8am",
+    ),
+    "https://m.toutiao.com/is/AC95ndR4aFk/",
+  );
+  assert.equal(
+    extractUrlFromText("请查看（https://example.com/article）。"),
+    "https://example.com/article",
+  );
 });
 
 class FakePageLoader implements PageLoader {
@@ -129,7 +145,7 @@ test("POST /api/clips saves Obsidian Markdown and skips duplicate URLs", async (
       method: "POST",
       url: "/api/clips",
       payload: {
-        url: "https://example.com/中文?id=1#section",
+        url: "【分享标题】点击链接打开👉 https://example.com/中文?id=1 口令 Axw:/ W@m.DH :8am",
       },
     });
 
@@ -152,7 +168,7 @@ test("POST /api/clips saves Obsidian Markdown and skips duplicate URLs", async (
     assert.match(markdown, /^---\n/);
     assert.match(markdown, /标题: "中文网页标题：测试"/);
     assert.match(markdown, /来源: "示例网站"/);
-    assert.match(markdown, /原文链接: "https:\/\/example\.com\/中文\?id=1#section"/);
+    assert.match(markdown, /原文链接: "https:\/\/example\.com\/中文\?id=1"/);
     assert.match(markdown, /收藏时间: \d{4}-\d{2}-\d{2}T/);
     assert.match(markdown, /分类: "健康养生"/);
     assert.match(markdown, /标签: \["健康","睡眠","头条"\]/);
