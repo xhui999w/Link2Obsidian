@@ -18,12 +18,12 @@
     <text x="184" y="250" fill="#a7f3d0">"saved"</text>
     <text x="270" y="250" fill="#f9fafb">,</text>
     <text x="62" y="284" fill="#f9fafb">"plugin": </text>
-    <text x="174" y="284" fill="#a7f3d0">"toutiao"</text>
+    <text x="174" y="284" fill="#a7f3d0">"instagram"</text>
     <text x="62" y="318" fill="#f9fafb">"category": </text>
     <text x="206" y="318" fill="#fde68a">"健康养生"</text>
     <text x="62" y="352" fill="#f9fafb">"tags": [</text>
-    <text x="174" y="352" fill="#fde68a">"健康", "睡眠", "头条"</text>
-    <text x="446" y="352" fill="#f9fafb">],</text>
+    <text x="174" y="352" fill="#fde68a">"健康", "睡眠", "Instagram"</text>
+    <text x="510" y="352" fill="#f9fafb">],</text>
     <text x="62" y="386" fill="#f9fafb">"ai": </text>
     <text x="140" y="386" fill="#a7f3d0">"disabled"</text>
     <text x="62" y="420" fill="#f9fafb">"file": </text>
@@ -34,4 +34,3 @@
   <rect x="34" y="532" width="1132" height="56" rx="10" fill="#172554"/>
   <text x="58" y="568" fill="#bfdbfe" font-family="system-ui, sans-serif" font-size="20">✓ 网页正文、分类和图片已经写入 Obsidian Vault</text>
 </svg>
-

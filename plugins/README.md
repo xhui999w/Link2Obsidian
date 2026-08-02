@@ -7,9 +7,9 @@ Each subdirectory contains a declarative `plugin.json` manifest:
 ```text
 plugins/
 ├── general/
-├── toutiao/
-├── zhihu/
-└── wechat/
+├── instagram/
+├── x/
+└── ...
 ```
 
 Plugins may declare URL matching, a page-ready selector, elements to remove,

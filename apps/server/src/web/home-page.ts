@@ -238,7 +238,7 @@ export function renderHomePage(): string {
           inputmode="url"
           autocapitalize="none"
           spellcheck="false"
-          placeholder="粘贴网页链接，或直接粘贴今日头条等平台的整段分享文字"
+          placeholder="粘贴网页链接，或直接粘贴平台的整段分享文字"
           required
         ></textarea>
         <button id="submit" type="submit">保存到 Obsidian</button>

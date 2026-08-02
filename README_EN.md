@@ -22,7 +22,7 @@ only job is to convert links into durable Obsidian files.
 - URL duplicate prevention and content-based image deduplication
 - Unicode-safe filenames, including Chinese titles
 - Topic-based Vault folders and Obsidian tags
-- Built-in adapters for general pages, Toutiao, Zhihu, and WeChat articles
+- Built-in adapters for general pages, Instagram, and X (Twitter)
 - Optional summaries, keywords, category suggestions, and tags with AI
 - Ollama and OpenAI-compatible local or cloud APIs
 - Full non-AI fallback when AI is disabled or unavailable
@@ -85,7 +85,7 @@ source: "Example"
 url: "https://example.com/article"
 created: 2026-07-27T12:00:00.000Z
 category: "AI人工智能"
-tags: ["AI","Research","Zhihu"]
+tags: ["AI","Research","Instagram"]
 ---
 
 Article body…

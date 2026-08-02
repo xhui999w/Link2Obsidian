@@ -73,7 +73,7 @@ body:
 summary: "文章摘要"
 keywords: ["关键词一", "关键词二"]
 category: "AI人工智能"
-tags: ["AI", "大模型", "知乎"]
+tags: ["AI", "大模型", "Instagram"]
 ```
 
 The API result reports:
@@ -81,4 +81,3 @@ The API result reports:
 - `ai: "enhanced"` — AI metadata was applied;
 - `ai: "disabled"` — AI was turned off;
 - `ai: "fallback"` — AI failed and rule-based classification was used.
-

@@ -14,7 +14,7 @@ Roadmap 只围绕“链接 → Markdown → Obsidian”。完成顺序会根据�
 - [x] Obsidian Markdown 和 YAML Frontmatter
 - [x] 中文文件名和 URL 防重复
 - [x] 正文图片下载、重命名、路径替换和内容去重
-- [x] 普通网页、今日头条、知乎、微信公众号插件
+- [x] 普通网页、Instagram、X（Twitter）插件
 - [x] 十类主题目录和来源标签
 - [x] Ollama 与 OpenAI-compatible AI 增强
 - [x] AI 关闭和故障回退
@@ -58,7 +58,7 @@ The roadmap remains limited to “URL → Markdown → Obsidian”.
 - [x] Docker foundation
 - [x] Chromium loading and Defuddle extraction
 - [x] Obsidian Markdown, local images, and duplicate prevention
-- [x] General, Toutiao, Zhihu, and WeChat adapters
+- [x] General web, Instagram, and X (Twitter) adapters
 - [x] Topic folders and source tags
 - [x] Optional Ollama and OpenAI-compatible AI enhancement
 - [x] Non-AI and provider-failure fallbacks
@@ -78,4 +78,3 @@ The roadmap remains limited to “URL → Markdown → Obsidian”.
 
 No note editor, knowledge-base search, reading queue, recommendations, social
 features, or general-purpose downloader.
-

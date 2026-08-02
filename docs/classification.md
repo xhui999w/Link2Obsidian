@@ -28,17 +28,16 @@ source tag:
 
 | Plugin | Source tag |
 | --- | --- |
-| Toutiao | `头条` |
-| Zhihu | `知乎` |
-| WeChat | `微信` |
+| Instagram | `Instagram` |
+| X (Twitter) | `X` |
 
 Obsidian frontmatter stores tag names without a leading `#`:
 
 ```yaml
-tags: ["健康", "睡眠", "头条"]
+tags: ["健康", "睡眠", "Instagram"]
 ```
 
-Obsidian presents these as `#健康`, `#睡眠`, and `#头条`.
+Obsidian presents these as `#健康`, `#睡眠`, and `#Instagram`.
 
 ## Output
 
@@ -51,4 +50,3 @@ Vault/
 
 Classification rules are defined in
 `apps/server/src/application/topic-classifier.ts`.
-
