@@ -13,6 +13,9 @@ export async function registerRoutes(
 ): Promise<void> {
   app.get("/", async (_request, reply) => {
     return reply
+      .header("Cache-Control", "no-store, max-age=0")
+      .header("Pragma", "no-cache")
+      .header("Expires", "0")
       .type("text/html; charset=utf-8")
       .send(renderHomePage());
   });

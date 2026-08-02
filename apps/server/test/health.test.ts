@@ -61,7 +61,9 @@ test("GET / serves the mobile-friendly clipping page", async () => {
 
   assert.equal(response.statusCode, 200);
   assert.match(response.headers["content-type"] ?? "", /^text\/html/);
+  assert.equal(response.headers["cache-control"], "no-store, max-age=0");
   assert.match(response.body, /<meta name="viewport"/);
+  assert.match(response.body, /<textarea/);
   assert.match(response.body, /保存到 Obsidian/);
   assert.match(response.body, /fetch\("\/api\/clips"/);
   await app.close();
