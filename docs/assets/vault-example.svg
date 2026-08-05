@@ -24,11 +24,10 @@
   <line x1="462" y1="122" x2="1156" y2="122" stroke="#cbd5e1"/>
   <g font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="18">
     <text x="462" y="164" fill="#64748b">---</text>
-    <text x="462" y="196" fill="#334155">title: "改善睡眠的方法"</text>
-    <text x="462" y="228" fill="#334155">source: "示例健康账号"</text>
-    <text x="462" y="260" fill="#334155">url: "https://example.com/sleep"</text>
-    <text x="462" y="292" fill="#334155">category: "健康养生"</text>
-    <text x="462" y="324" fill="#334155">tags: ["健康","睡眠","Instagram"]</text>
+    <text x="462" y="196" fill="#334155">url: "https://example.com/sleep"</text>
+    <text x="462" y="228" fill="#334155">created: 2026-07-27T12:00:00Z</text>
+    <text x="462" y="260" fill="#334155">category: "健康养生"</text>
+    <text x="462" y="292" fill="#334155">tags: ["健康","睡眠","Instagram"]</text>
     <text x="462" y="356" fill="#64748b">---</text>
     <text x="462" y="410" fill="#0f172a">网页正文已经转换为 Markdown……</text>
     <text x="462" y="456" fill="#4f46e5">![[Attachments/改善睡眠--a1b2c3d4e5/image001.jpg]]</text>

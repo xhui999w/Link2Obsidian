@@ -136,8 +136,6 @@ export class ClipService {
     });
     const body = this.markdownConverter.convert(localized.html);
     const markdown = renderMarkdown({
-      title: article.title,
-      source: article.source,
       url: originalUrl,
       created: new Date().toISOString(),
       category,
@@ -356,8 +354,6 @@ async function availableNotePath(
 }
 
 function renderMarkdown(input: {
-  title: string;
-  source: string;
   url: string;
   created: string;
   category: string;
@@ -369,8 +365,6 @@ function renderMarkdown(input: {
 }): string {
   return [
     "---",
-    `标题: ${yamlString(input.title)}`,
-    `来源: ${yamlString(input.source)}`,
     `原文链接: ${yamlString(input.url)}`,
     `收藏时间: ${input.created}`,
     `分类: ${yamlString(input.category)}`,

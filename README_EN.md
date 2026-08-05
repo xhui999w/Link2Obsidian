@@ -80,8 +80,6 @@ MyVault/
 
 ```markdown
 ---
-title: "Article title"
-source: "Example"
 url: "https://example.com/article"
 created: 2026-07-27T12:00:00.000Z
 category: "AI人工智能"

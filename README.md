@@ -118,8 +118,6 @@ Markdown 示例：
 
 ```markdown
 ---
-title: "改善睡眠的方法"
-source: "示例网站"
 url: "https://example.com/sleep"
 created: 2026-07-27T12:00:00.000Z
 category: "健康养生"

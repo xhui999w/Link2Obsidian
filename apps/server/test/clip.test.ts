@@ -166,8 +166,8 @@ test("POST /api/clips saves Obsidian Markdown and skips duplicate URLs", async (
       "utf8",
     );
     assert.match(markdown, /^---\n/);
-    assert.match(markdown, /标题: "中文网页标题：测试"/);
-    assert.match(markdown, /来源: "示例网站"/);
+    assert.doesNotMatch(markdown, /^标题:/m);
+    assert.doesNotMatch(markdown, /^来源:/m);
     assert.match(markdown, /原文链接: "https:\/\/example\.com\/中文\?id=1"/);
     assert.match(markdown, /收藏时间: \d{4}-\d{2}-\d{2}T/);
     assert.match(markdown, /分类: "健康养生"/);
