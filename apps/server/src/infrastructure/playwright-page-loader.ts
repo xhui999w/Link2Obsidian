@@ -10,7 +10,11 @@ export class PlaywrightPageLoader implements PageLoader {
 
   constructor(private readonly config: AppConfig) {}
 
-  async load(url: string, plugin: SitePluginManifest): Promise<LoadedPage> {
+  async load(
+    url: string,
+    plugin: SitePluginManifest,
+    retryAfterCrash = true,
+  ): Promise<LoadedPage> {
     const browser = await this.getBrowser();
     const context = await browser.newContext({
       locale: this.config.runtime.language,
@@ -67,6 +71,11 @@ export class PlaywrightPageLoader implements PageLoader {
         throw error;
       }
 
+      if (retryAfterCrash && isBrowserTargetCrash(error)) {
+        await this.close();
+        return this.load(url, plugin, false);
+      }
+
       const message = error instanceof Error ? error.message : "Unknown browser error";
       throw new ClipError("PAGE_LOAD_FAILED", message, 422);
     } finally {
@@ -83,11 +92,26 @@ export class PlaywrightPageLoader implements PageLoader {
     if (!this.browser?.isConnected()) {
       this.browser = await chromium.launch({
         headless: true,
+        args: [
+          "--disable-dev-shm-usage",
+          "--disable-gpu",
+        ],
       });
     }
 
     return this.browser;
   }
+}
+
+export function isBrowserTargetCrash(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return (
+    error.message.includes("Target crashed")
+    || error.message.includes("Page crashed")
+  );
 }
 
 export async function withStablePage<T>(

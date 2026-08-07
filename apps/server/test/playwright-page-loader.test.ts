@@ -3,7 +3,10 @@ import test from "node:test";
 
 import type { Page } from "playwright";
 
-import { withStablePage } from "../src/infrastructure/playwright-page-loader.js";
+import {
+  isBrowserTargetCrash,
+  withStablePage,
+} from "../src/infrastructure/playwright-page-loader.js";
 
 test("withStablePage retries when a late navigation destroys the execution context", async () => {
   let attempts = 0;
@@ -40,4 +43,9 @@ test("withStablePage does not retry unrelated failures", async () => {
   );
 
   assert.equal(attempts, 1);
+});
+
+test("recognizes Chromium target crashes for automatic recovery", () => {
+  assert.equal(isBrowserTargetCrash(new Error("page.evaluate: Target crashed")), true);
+  assert.equal(isBrowserTargetCrash(new Error("page.goto: Timeout exceeded")), false);
 });
