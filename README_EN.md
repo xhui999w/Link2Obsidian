@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/link2obsidian-icon-256.png" width="128" height="128" alt="Link2Obsidian icon">
+</p>
+
 # Link2Obsidian
 
 [简体中文](README.md) · [Docker guide](docs/docker-deployment.md) · [Configuration](docs/configuration.md) · [Roadmap](ROADMAP.md)

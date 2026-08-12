@@ -1,4 +1,6 @@
 import type { FastifyInstance } from "fastify";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 import type { ClipService } from "../application/clip-service.js";
 import type { AppConfig } from "../config/env.js";
@@ -11,6 +13,22 @@ export async function registerRoutes(
   clipService: ClipService,
   pluginRegistry: PluginRegistry,
 ): Promise<void> {
+  app.get("/assets/link2obsidian-icon.png", async (_request, reply) => {
+    const icon = await readFile(join(process.cwd(), "assets", "link2obsidian-icon-256.png"));
+    return reply
+      .header("Cache-Control", "public, max-age=604800, immutable")
+      .type("image/png")
+      .send(icon);
+  });
+
+  app.get("/favicon.png", async (_request, reply) => {
+    const icon = await readFile(join(process.cwd(), "assets", "link2obsidian-favicon.png"));
+    return reply
+      .header("Cache-Control", "public, max-age=604800, immutable")
+      .type("image/png")
+      .send(icon);
+  });
+
   app.get("/", async (_request, reply) => {
     return reply
       .header("Cache-Control", "no-store, max-age=0")

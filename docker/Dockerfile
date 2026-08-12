@@ -25,6 +25,7 @@ COPY --from=build --chown=node:node /app/apps/server/dist ./apps/server/dist
 COPY --from=build --chown=node:node /app/packages/plugin-api/package.json ./packages/plugin-api/package.json
 COPY --from=build --chown=node:node /app/packages/plugin-api/dist ./packages/plugin-api/dist
 COPY --chown=node:node plugins ./plugins
+COPY --chown=node:node assets ./assets
 
 RUN npx playwright install --with-deps chromium \
   && chown -R node:node /ms-playwright

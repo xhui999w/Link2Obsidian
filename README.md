@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/link2obsidian-icon-256.png" width="128" height="128" alt="Link2Obsidian 图标">
+</p>
+
 # Link2Obsidian（纳知库）
 
 [English](README_EN.md) · [Docker 部署](docs/docker-deployment.zh-CN.md) · [NAS 安装](docs/nas-installation.zh-CN.md) · [配置说明](docs/configuration.zh-CN.md) · [Roadmap](ROADMAP.md)

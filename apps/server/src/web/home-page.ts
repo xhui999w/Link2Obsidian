@@ -5,6 +5,8 @@ export function renderHomePage(): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f4f1ea">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/assets/link2obsidian-icon.png">
   <title>Link2Obsidian</title>
   <style>
     :root {
@@ -53,13 +55,9 @@ export function renderHomePage(): string {
     }
 
     .mark {
-      display: grid;
       width: 34px;
       height: 34px;
-      place-items: center;
-      border-radius: 11px;
-      color: white;
-      background: var(--accent);
+      object-fit: contain;
       box-shadow: 0 8px 22px rgba(103, 80, 164, 0.28);
     }
 
@@ -225,7 +223,7 @@ export function renderHomePage(): string {
 </head>
 <body>
   <main>
-    <div class="brand"><span class="mark">L2O</span> 纳知库</div>
+    <div class="brand"><img class="mark" src="/assets/link2obsidian-icon.png" alt=""> 纳知库</div>
     <h1>把网页，收进 Obsidian。</h1>
     <p class="lead">粘贴文章链接，系统会自动提取正文、下载图片并生成 Obsidian 兼容 Markdown。</p>
 
