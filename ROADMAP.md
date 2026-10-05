@@ -14,7 +14,7 @@ Roadmap 只围绕“链接 → Markdown → Obsidian”。完成顺序会根据�
 - [x] Obsidian Markdown 和 YAML Frontmatter
 - [x] 中文文件名和 URL 防重复
 - [x] 正文图片下载、重命名、路径替换和内容去重
-- [x] 普通网页、Instagram、X（Twitter）插件
+- [x] 普通网页、微信、今日头条、知乎、Instagram、X（Twitter）插件
 - [x] 十类主题目录和来源标签
 - [x] Ollama 与 OpenAI-compatible AI 增强
 - [x] AI 关闭和故障回退
@@ -22,11 +22,14 @@ Roadmap 只围绕“链接 → Markdown → Obsidian”。完成顺序会根据�
 
 ### 下一阶段：发布稳定性
 
-- [ ] API Token 鉴权
-- [ ] SSRF 防护和重定向地址复检
-- [ ] 任务持久化和有限重试
+- [x] API Token 鉴权
+- [x] SSRF 防护、DNS/IP 校验、IP 固定连接和重定向复检
+- [x] SQLite 任务元数据、历史分页、手动失败重试
+- [x] 轻量控制台和文件路径复制/查看
+- [x] URL 索引查重及旧文件一次性迁移
+- [x] 跳过、覆盖、另存新版策略
 - [ ] 更明确的错误码和诊断日志
-- [ ] amd64/arm64 镜像自动构建与 GHCR 发布
+- [x] amd64/arm64 GHCR 构建配置（实际发布由 Actions 验证）
 - [ ] 版本化配置迁移和发布说明
 - [ ] 更多真实中文网页回归样例
 
@@ -38,7 +41,7 @@ Roadmap 只围绕“链接 → Markdown → Obsidian”。完成顺序会根据�
 - [ ] 更多站点插件
 - [ ] 可配置分类规则和目录映射
 - [ ] WebDAV/SFTP Vault Writer
-- [ ] 文章更新策略和附件垃圾清理
+- [ ] 附件垃圾清理
 
 ### 明确不做
 
@@ -58,7 +61,7 @@ The roadmap remains limited to “URL → Markdown → Obsidian”.
 - [x] Docker foundation
 - [x] Chromium loading and Defuddle extraction
 - [x] Obsidian Markdown, local images, and duplicate prevention
-- [x] General web, Instagram, and X (Twitter) adapters
+- [x] General web, WeChat, Toutiao, Zhihu, Instagram, and X (Twitter) adapters
 - [x] Topic folders and source tags
 - [x] Optional Ollama and OpenAI-compatible AI enhancement
 - [x] Non-AI and provider-failure fallbacks
@@ -66,11 +69,14 @@ The roadmap remains limited to “URL → Markdown → Obsidian”.
 
 ### Next: release hardening
 
-- [ ] API token authentication
-- [ ] SSRF protection
-- [ ] Persistent jobs and bounded retries
+- [x] API token authentication
+- [x] SSRF checks, pinned DNS/IP connections and redirect revalidation
+- [x] Persistent SQLite metadata, paginated history and manual retries
+- [x] Compact dashboard, copy/view note paths and recapture
+- [x] Indexed URL lookup and one-time legacy import
+- [x] Skip, overwrite and save-new-version policies
 - [ ] Improved diagnostics
-- [ ] Automated amd64/arm64 GHCR images
+- [x] Automated amd64/arm64 GHCR build configuration (publishing verified by Actions)
 - [ ] Versioned configuration migrations
 - [ ] More real-world Chinese page fixtures
 

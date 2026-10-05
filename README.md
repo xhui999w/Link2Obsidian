@@ -14,18 +14,20 @@ Link2Obsidian 是一个运行在 NAS 上的自动化采集工具：
 
 它不是笔记软件、知识库、阅读器或下载管理器。它只负责把链接可靠地转换成 Obsidian 文件。
 
-> 当前状态：可用 MVP。建议先在局域网中使用；API 鉴权仍在 Roadmap 中。
+> V0.2：轻量控制台、SQLite 任务记录、重复策略和 API 鉴权。部署前设置自己的 API Token，保留 data 挂载目录。
 
 ## 功能
 
 - 使用 Chromium 加载普通网页和动态网页
 - 使用 Defuddle 提取标题、来源和正文
 - 自动下载正文图片并转换为 Obsidian `![[附件]]`
-- 相同 URL 防重复保存，重复图片按内容去重
+- 持久化任务、最近记录、失败重试、重新抓取和文件路径查看/复制
+- SQLite 索引查重；重复文章可跳过、覆盖或另存新版，正文只保存在 Vault
+- API Token 鉴权及公网地址校验，拦截内网访问和危险跳转
 - 自动生成中文安全文件名
 - 按知识主题保存到十个默认目录
 - 自动生成主题标签，并保留网站来源标签
-- 内置普通网页、Instagram、X（Twitter）适配插件
+- 内置普通网页、微信、今日头条、知乎、Instagram、X（Twitter）适配插件
 - 可选 AI 摘要、关键词、分类建议和标签
 - 支持 Ollama、本地模型和 OpenAI-compatible 云端 API
 - AI 关闭、超时或出错时，基础采集仍然正常工作
@@ -52,6 +54,7 @@ cp .env.example .env
 
 ```env
 L2O_VAULT_HOST_PATH=/volume1/Obsidian/MyVault
+L2O_API_TOKEN=替换成你自己生成的长随机字符串
 ```
 
 把路径换成 NAS 上真实的 Obsidian Vault 目录。该目录必须允许容器写入。
@@ -77,6 +80,7 @@ curl http://NAS-IP:8080/health
 
 ```bash
 curl -X POST http://NAS-IP:8080/api/clips \
+  -H "Authorization: Bearer $L2O_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"url":"https://example.com/article"}'
 ```
@@ -93,7 +97,7 @@ curl -X POST http://NAS-IP:8080/api/clips \
   "title": "文章标题",
   "source": "example.com",
   "url": "https://example.com/article",
-  "file": "Clippings/生活经验/文章标题--a1b2c3d4e5.md",
+  "file": "Clippings/生活经验/文章标题.md",
   "images": {
     "downloaded": 2,
     "failed": 0
@@ -109,7 +113,7 @@ curl -X POST http://NAS-IP:8080/api/clips \
 MyVault/
 ├── Clippings/
 │   ├── 健康养生/
-│   │   └── 改善睡眠--a1b2c3d4e5.md
+│   │   └── 改善睡眠.md
 │   ├── AI人工智能/
 │   └── 编程开发/
 └── Attachments/
@@ -122,10 +126,10 @@ Markdown 示例：
 
 ```markdown
 ---
-url: "https://example.com/sleep"
-created: 2026-07-27T12:00:00.000Z
-category: "健康养生"
-tags: ["健康","睡眠","Example"]
+原文链接: "https://example.com/sleep"
+收藏时间: 2026-07-27T12:00:00.000Z
+分类: "健康养生"
+标签: ["健康","睡眠","Example"]
 ---
 
 正文内容……
@@ -184,16 +188,28 @@ AI 可以补充：
 
 | 方法 | 地址 | 说明 |
 | --- | --- | --- |
-| `GET` | `/` | 服务信息 |
+| `GET` | `/` | 轻量控制台 |
 | `GET` | `/health` | 健康状态和 AI 状态 |
 | `GET` | `/api/plugins` | 已加载的网站插件 |
 | `POST` | `/api/clips` | 提交一个网页链接 |
 
-当前没有管理后台。可以使用 `curl`、iOS 快捷指令、浏览器脚本或其他自动化工具调用 API。
+访问 `http://NAS-IP:8080/` 使用轻量控制台，在页面右上角输入 Token。Token 只在当前页面内存中保存，刷新后需重新输入。
+
+| 方法 | 地址 | 说明 |
+| --- | --- | --- |
+| `POST` | `/api/tasks` | 异步创建任务，返回 202 和任务 ID |
+| `GET` | `/api/tasks?limit=20&offset=0` | 分页历史 |
+| `GET` | `/api/tasks/:id` | 查询任务 |
+| `POST` | `/api/tasks/:id/retry` | 重试或重新抓取，创建独立记录 |
+
+请求示例：`{"url":"https://example.com/article","policy":"skip"}`。`policy` 可为 `skip`、`overwrite`、`suffix`。省略时使用服务端 `L2O_DUPLICATE_POLICY`；控制台默认跳过。成功任务状态为 `success`，结果内的 `duplicate` 表示已跳过。`/api/clips` 保持同步返回格式，也记录历史。
 
 ## 支持的网站
 
 - 普通文章网页：通用 Defuddle 提取
+- 微信公众号：站点专用标题、作者和正文提取
+- 今日头条：文章正文和图片适配
+- 知乎：问题、回答和文章内容适配
 - Instagram：支持帖子正文和多图采集
 - X（Twitter）：支持帖子正文和图片采集
 
@@ -214,7 +230,7 @@ Link2Obsidian 不计划加入：
 
 ## 开发
 
-需要 Node.js 22+：
+需要 Node.js 22.13+（内置 SQLite，无额外数据库服务）：
 
 ```bash
 npm install
@@ -250,3 +266,13 @@ npm run build
 ## License
 
 [MIT](LICENSE)
+
+## V0.2 升级说明
+
+SQLite 文件位于 `L2O_DATA_PATH/tasks.sqlite`，只保存任务元数据与 URL/文件索引。旧笔记在首次启动时扫描并建立索引；原文件保持原样，旧文章不会凭空生成任务历史。迁移后的查重不再递归扫描目录，缺失的已索引笔记会重新采集。
+
+覆盖会保留原文件路径，原分类目录不移动；每次抓取使用独立附件目录，避免覆盖旧图片。旧附件不自动清理。手动移动、修改或新增旧笔记后，可停服务、备份并移走 `tasks.sqlite`、`tasks.sqlite-wal`、`tasks.sqlite-shm`，重启重建索引（任务历史会重置）。备份时保留 Vault 和 data。
+
+队列使用单个持久化工作线程：待处理任务重启后继续，正在处理的任务标记失败并允许手动重试，不自动重复覆盖文件。同一 data 目录只运行一个实例。
+
+GHCR 构建目标为 `linux/amd64,linux/arm64`。配置的上游代理需为支持 CONNECT 的 HTTP/HTTPS 代理；V0.2 不再支持 SOCKS 代理。SSRF 防护用于用户网页及图片请求，管理员配置的 AI 服务可继续使用局域网 Ollama。HTTPS 反向代理用于保护传输中的 Token。

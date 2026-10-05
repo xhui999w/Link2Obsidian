@@ -1,11 +1,11 @@
 {
   "name": "link2obsidian",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Turn web links into Markdown files for an Obsidian vault.",
   "license": "MIT",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13"
   },
   "workspaces": [
     "apps/*",

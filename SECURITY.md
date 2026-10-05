@@ -2,8 +2,21 @@
 
 ## Current deployment boundary
 
-The current MVP does not enforce `L2O_API_TOKEN`. Do not expose the HTTP port
-directly to the public internet. Use a trusted LAN or VPN.
+V0.2 enforces `L2O_API_TOKEN` on all `/api/*` routes when configured.
+Docker Compose requires a token; choose a long random value. Empty-token
+standalone processes preserve trusted-network compatibility. Use HTTPS for
+remote access. Tokens are not stored persistently by the dashboard.
+
+User page and image URLs must use HTTP/HTTPS and resolve only to public IPs.
+The local egress proxy connects to the validated IP, including browser
+subresources and HTTPS CONNECT tunnels. Redirect destinations and final page
+URLs are checked. Local, private, link-local, multicast, mapped/transition and
+special-purpose ranges are blocked. Upstream proxies must support CONNECT to
+literal IPs. Administrator-configured proxy and AI endpoints are trusted
+configuration and may be on the LAN.
+
+Run one instance per data directory. The service uses a writable SQLite
+metadata database and a Vault mount; do not mount unrelated sensitive paths.
 
 The service loads user-submitted URLs and writes files into a mounted Obsidian
 Vault. Review volume paths carefully and keep regular Vault backups.
@@ -20,4 +33,3 @@ maintainer privately through the repository owner's published contact method.
 
 Include the affected version, impact, reproduction conditions, and a proposed
 mitigation if available.
-
