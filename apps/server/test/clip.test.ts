@@ -291,7 +291,7 @@ function createConfig(vaultPath: string): AppConfig {
       imageTimeoutMs: 15_000,
       maxImages: 100,
       maxImageBytes: 20 * 1024 * 1024,
-      duplicatePolicy: "overwrite",
+      duplicatePolicy: "skip",
       defaultCategory: "生活经验",
     },
     ai: {

@@ -4,25 +4,34 @@ import type { SitePluginManifest } from "@link2obsidian/plugin-api";
 import type { AppConfig } from "../config/env.js";
 import type { LoadedPage, PageLoader } from "../domain/clip.js";
 import { ClipError } from "../domain/errors.js";
+import { validatePublicUrl } from "./url-security.js";
+import { EgressProxy } from "./egress-proxy.js";
 
 export class PlaywrightPageLoader implements PageLoader {
   private browser?: Browser;
+  private readonly direct = new EgressProxy();
+  private readonly proxied: EgressProxy;
 
-  constructor(private readonly config: AppConfig) {}
+  constructor(private readonly config: AppConfig) {
+    this.proxied = new EgressProxy(config.runtime.proxyServer);
+  }
 
   async load(
     url: string,
     plugin: SitePluginManifest,
     retryAfterCrash = true,
   ): Promise<LoadedPage> {
+    await validatePublicUrl(url);
     const browser = await this.getBrowser();
     const context = await browser.newContext({
       locale: this.config.runtime.language,
       timezoneId: this.config.runtime.timezone,
       javaScriptEnabled: plugin.page?.javaScriptEnabled ?? true,
-      proxy: plugin.page?.useProxy && this.config.runtime.proxyServer
-        ? { server: this.config.runtime.proxyServer }
-        : undefined,
+      serviceWorkers: "block",
+      proxy: {
+        server: await (plugin.page?.useProxy ? this.proxied : this.direct).open(),
+        bypass: "<-loopback>",
+      },
       userAgent: plugin.page?.userAgent,
     });
 
@@ -62,6 +71,7 @@ export class PlaywrightPageLoader implements PageLoader {
         });
       }
 
+      await validatePublicUrl(page.url());
       return {
         html: await withStablePage(page, () => page.content()),
         finalUrl: page.url(),
@@ -86,6 +96,7 @@ export class PlaywrightPageLoader implements PageLoader {
   async close(): Promise<void> {
     await this.browser?.close();
     this.browser = undefined;
+    await Promise.all([this.direct.close(), this.proxied.close()]);
   }
 
   private async getBrowser(): Promise<Browser> {
@@ -95,6 +106,8 @@ export class PlaywrightPageLoader implements PageLoader {
         args: [
           "--disable-dev-shm-usage",
           "--disable-gpu",
+          "--disable-quic",
+          "--force-webrtc-ip-handling-policy=disable_non_proxied_udp",
         ],
       });
     }

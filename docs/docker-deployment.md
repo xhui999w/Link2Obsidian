@@ -44,6 +44,7 @@ Clip a test page:
 
 ```bash
 curl -X POST http://127.0.0.1:8080/api/clips \
+  -H "Authorization: Bearer $L2O_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"url":"https://example.com/"}'
 ```
@@ -79,3 +80,7 @@ core clipping pipeline; the response reports `"ai": "fallback"`.
 
 See [configuration](configuration.md) and the
 [Chinese NAS guide](nas-installation.zh-CN.md).
+
+## V0.2 upgrade notes
+
+Set a long random `L2O_API_TOKEN` in `.env`; Compose refuses an empty value. Enter the token on the homepage. Existing scripts and shortcuts need `Authorization: Bearer <token>`. Preserve the data mount for SQLite history and indexes; stop the service before backing up Vault and data. Legacy notes are indexed once. Node requires 22.13+ and GHCR targets amd64/arm64. Upstream proxies must support HTTP/HTTPS CONNECT. Private page/image destinations are blocked; LAN AI endpoints remain usable. Overwrite keeps the note path; old attachments are retained.

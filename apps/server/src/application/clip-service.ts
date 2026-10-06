@@ -1,10 +1,10 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import {
   access,
   mkdir,
-  open,
-  readdir,
   writeFile,
+  rename,
+  rm,
 } from "node:fs/promises";
 import { isAbsolute, relative, resolve, sep } from "node:path";
 
@@ -12,6 +12,8 @@ import { parseHTML } from "linkedom";
 
 import type { AiEnhancer } from "../ai/types.js";
 import { DEFAULT_CATEGORIES } from "./topic-classifier.js";
+import type { TaskStore } from "../infrastructure/task-store.js";
+import type { DuplicatePolicy } from "../config/env.js";
 import type { AppConfig } from "../config/env.js";
 import type {
   ArticleExtractor,
@@ -36,9 +38,10 @@ export class ClipService {
     private readonly pluginRegistry: PluginRegistry,
     private readonly classifier: ArticleClassifier,
     private readonly aiEnhancer: AiEnhancer,
+    private readonly store: TaskStore,
   ) {}
 
-  async clip(inputUrl: string): Promise<ClipResult> {
+  async clip(inputUrl: string, policy: DuplicatePolicy = "skip"): Promise<ClipResult> {
     const extractedUrl = extractUrlFromText(inputUrl);
     const normalizedUrl = normalizeUrl(extractedUrl);
     const key = urlHash(normalizedUrl);
@@ -48,7 +51,7 @@ export class ClipService {
       return current;
     }
 
-    const task = this.execute(extractedUrl, normalizedUrl, key).finally(() => {
+    const task = this.execute(extractedUrl, normalizedUrl, key, policy).finally(() => {
       this.active.delete(key);
     });
     this.active.set(key, task);
@@ -60,17 +63,30 @@ export class ClipService {
     originalUrl: string,
     normalizedUrl: string,
     key: string,
+    policy: DuplicatePolicy,
   ): Promise<ClipResult> {
     const outputRoot = resolveOutputDirectory(this.config);
     await mkdir(outputRoot, { recursive: true });
     const inputPlugin = this.pluginRegistry.select(normalizedUrl);
 
-    const duplicate = await findExistingFile(outputRoot, key);
+    const indexed = this.store.note(normalizedUrl) ?? this.store.note(key);
+    let duplicate = indexed ? resolve(this.config.storage.vaultPath, indexed.file) : undefined;
     if (duplicate) {
+      const boundary = relative(resolve(this.config.storage.vaultPath), duplicate);
+      if (boundary === ".." || boundary.startsWith(`..${sep}`)) throw new ClipError("INVALID_NOTE_PATH", "Indexed note escaped Vault", 500);
+      try { await access(duplicate); } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+        this.store.removeNote(normalizedUrl);
+        this.store.removeNote(key);
+        duplicate = undefined;
+      }
+    }
+    if (duplicate && policy === "skip") {
       return {
         status: "duplicate",
         url: originalUrl,
         file: vaultRelativePath(this.config.storage.vaultPath, duplicate),
+        title: indexed?.title,
         plugin: inputPlugin.id,
         category: categoryFromPath(outputRoot, duplicate),
       };
@@ -120,14 +136,18 @@ export class ClipService {
         aiStatus = "fallback";
       }
     }
+    if (policy === "overwrite" && duplicate) {
+      category = categoryFromPath(outputRoot, duplicate) ?? category;
+    }
     const outputDirectory = resolveCategoryDirectory(
       outputRoot,
       category,
     );
     await mkdir(outputDirectory, { recursive: true });
     const visibleBasename = safeFilename(article.title);
-    const attachmentBasename = `${visibleBasename}--${key}`;
-    const destination = await availableNotePath(outputDirectory, visibleBasename);
+    const attachmentBasename = `${visibleBasename}--${key}--${randomUUID()}`;
+    const destination = policy === "overwrite" && duplicate
+      ? duplicate : await availableNotePath(outputDirectory, visibleBasename);
     const localized = await this.imageLocalizer.localize({
       html: article.html,
       pageUrl: page.finalUrl,
@@ -146,29 +166,21 @@ export class ClipService {
       key,
     });
 
-    try {
-      await writeFile(destination, markdown, {
-        encoding: "utf8",
-        flag: "wx",
-      });
-    } catch (error) {
-      if (isAlreadyExists(error)) {
-        return {
-          status: "duplicate",
-          title: article.title,
-          source: article.source,
-          url: originalUrl,
-          file: vaultRelativePath(this.config.storage.vaultPath, destination),
-          plugin: extractionPlugin.id,
-          category,
-          tags,
-          summary,
-          keywords,
-          ai: aiStatus,
-        };
-      }
-      throw error;
+    if (policy === "overwrite" && duplicate) {
+      const temporary = destination + "." + randomUUID() + ".tmp";
+      try {
+        await writeFile(temporary, markdown, { encoding: "utf8", flag: "wx" });
+        await rename(temporary, destination);
+      } finally { await rm(temporary, { force: true }); }
+    } else {
+      await writeFile(destination, markdown, { encoding: "utf8", flag: "wx" });
     }
+    this.store.removeNote(key);
+    this.store.recordNote(normalizedUrl, {
+      file: vaultRelativePath(this.config.storage.vaultPath, destination),
+      title: article.title,
+      category,
+    });
 
     return {
       status: "saved",
@@ -210,6 +222,9 @@ export function normalizeUrl(input: string): string {
 
   if (url.protocol !== "http:" && url.protocol !== "https:") {
     throw new ClipError("INVALID_URL", "Only HTTP and HTTPS URLs are supported", 400);
+  }
+  if (url.username || url.password) {
+    throw new ClipError("INVALID_URL", "URLs containing credentials are not supported", 400);
   }
 
   url.hash = "";
@@ -277,59 +292,6 @@ function resolveOutputDirectory(config: AppConfig): string {
   }
 
   return output;
-}
-
-async function findExistingFile(
-  outputDirectory: string,
-  hash: string,
-): Promise<string | undefined> {
-  const suffix = `--${hash}.md`;
-  const entries = await readdir(outputDirectory, { withFileTypes: true });
-  for (const entry of entries) {
-    const path = resolve(outputDirectory, entry.name);
-    if (entry.isFile() && entry.name.endsWith(".md")) {
-      if (entry.name.endsWith(suffix) || await fileContainsClipId(path, hash)) {
-        return path;
-      }
-    }
-    if (entry.isDirectory()) {
-      const nested = await findExistingFile(path, hash);
-      if (nested) {
-        return nested;
-      }
-    }
-  }
-  return undefined;
-}
-
-async function fileContainsClipId(path: string, hash: string): Promise<boolean> {
-  const handle = await open(path, "r");
-  try {
-    const buffer = Buffer.alloc(4_096);
-    const { bytesRead } = await handle.read(buffer, 0, buffer.length, 0);
-    const header = buffer.subarray(0, bytesRead).toString("utf8");
-    if (header.includes(`<!-- link2obsidian-id: ${hash} -->`)) {
-      return true;
-    }
-
-    const urlValue = header
-      .match(/^(?:url|原文链接):\s*(.+)$/m)?.[1]
-      ?.trim();
-    if (!urlValue) {
-      return false;
-    }
-
-    try {
-      const url = urlValue.startsWith('"')
-        ? JSON.parse(urlValue) as string
-        : urlValue;
-      return urlHash(normalizeUrl(url)) === hash;
-    } catch {
-      return false;
-    }
-  } finally {
-    await handle.close();
-  }
 }
 
 async function availableNotePath(
@@ -422,13 +384,4 @@ function yamlString(value: string): string {
 
 function vaultRelativePath(vaultPath: string, filePath: string): string {
   return relative(resolve(vaultPath), filePath).split(sep).join("/");
-}
-
-function isAlreadyExists(error: unknown): boolean {
-  return (
-    typeof error === "object"
-    && error !== null
-    && "code" in error
-    && error.code === "EEXIST"
-  );
 }

@@ -8,6 +8,8 @@ import { fetch as undiciFetch, ProxyAgent } from "undici";
 
 import type { AppConfig } from "../config/env.js";
 import type { ImageLocalizer, LocalizedArticle } from "../domain/clip.js";
+import { EgressProxy } from "./egress-proxy.js";
+import { validatePublicUrl, type Resolver } from "./url-security.js";
 import { ClipError } from "../domain/errors.js";
 
 const CONTENT_TYPE_EXTENSIONS: Readonly<Record<string, string>> = {
@@ -41,16 +43,18 @@ type ImageFetch = (
 ) => Promise<Response>;
 
 export class HttpImageLocalizer implements ImageLocalizer {
-  private readonly proxyAgent?: ProxyAgent;
+  private readonly direct = new EgressProxy();
+  private readonly proxied: EgressProxy;
+  private directAgent?: ProxyAgent;
+  private upstreamAgent?: ProxyAgent;
 
   constructor(
     private readonly config: AppConfig,
     private readonly fetchImage: ImageFetch = undiciFetch as ImageFetch,
     private readonly heicConverter: HeicConverter = convertHeic,
+    private readonly resolver?: Resolver,
   ) {
-    this.proxyAgent = config.runtime.proxyServer
-      ? new ProxyAgent(config.runtime.proxyServer)
-      : undefined;
+    this.proxied = new EgressProxy(config.runtime.proxyServer);
   }
 
   async localize(input: {
@@ -120,22 +124,46 @@ export class HttpImageLocalizer implements ImageLocalizer {
     };
   }
 
+  async close(): Promise<void> {
+    await Promise.all([this.directAgent?.close(), this.upstreamAgent?.close()]);
+    await Promise.all([this.direct.close(), this.proxied.close()]);
+  }
+
   private async download(
     url: string,
     pageUrl: string,
     useProxy = false,
   ): Promise<{ bytes: Uint8Array; extension: string }> {
-    const response = await this.fetchImage(url, {
-      headers: {
-        Accept: "image/avif,image/webp,image/png,image/jpeg,image/gif,image/svg+xml,image/*;q=0.8",
-        Referer: pageUrl,
-      },
-      redirect: "follow",
-      signal: AbortSignal.timeout(this.config.runtime.imageTimeoutMs),
-      dispatcher: useProxy ? this.proxyAgent : undefined,
-    });
+    let dispatcher: ProxyAgent | undefined;
+    if (this.fetchImage === (undiciFetch as ImageFetch)) {
+      if (useProxy) dispatcher = this.upstreamAgent ??= new ProxyAgent(await this.proxied.open());
+      else dispatcher = this.directAgent ??= new ProxyAgent(await this.direct.open());
+    }
+    let response: Response | undefined;
+    const signal = AbortSignal.timeout(this.config.runtime.imageTimeoutMs);
+    for (let redirects = 0; redirects <= 10; redirects += 1) {
+      await validatePublicUrl(url, this.resolver);
+      response = await this.fetchImage(url, {
+        headers: {
+          Accept: "image/avif,image/webp,image/png,image/jpeg,image/gif,image/svg+xml,image/*;q=0.8",
+          Referer: pageUrl,
+        },
+        redirect: "manual",
+        signal,
+        dispatcher,
+      });
+      if (![301, 302, 303, 307, 308].includes(response.status)) break;
+      const location = response.headers.get("location");
+      await response.body?.cancel();
+      if (!location || redirects === 10) throw new Error("Invalid image redirect");
+      url = new URL(location, url).toString();
+    }
+    if (!response) throw new Error("Image response missing");
+    try { await validatePublicUrl(response.url || url, this.resolver); }
+    catch (error) { await response.body?.cancel(); throw error; }
 
     if (!response.ok) {
+      await response.body?.cancel();
       throw new Error(`Image returned HTTP ${response.status}`);
     }
 
@@ -147,6 +175,7 @@ export class HttpImageLocalizer implements ImageLocalizer {
       Number.isFinite(announcedSize)
       && announcedSize > this.config.runtime.maxImageBytes
     ) {
+      await response.body?.cancel();
       throw new Error("Image exceeds the configured size limit");
     }
 
@@ -154,10 +183,25 @@ export class HttpImageLocalizer implements ImageLocalizer {
       ?.split(";", 1)[0]
       ?.trim()
       .toLowerCase();
-    let bytes = new Uint8Array(await response.arrayBuffer());
-    if (bytes.byteLength > this.config.runtime.maxImageBytes) {
-      throw new Error("Image exceeds the configured size limit");
+    const chunks: Uint8Array[] = [];
+    let total = 0;
+    const reader = response.body?.getReader();
+    if (!reader) throw new Error("Image body is missing");
+    try {
+      while (true) {
+        const chunk = await reader.read();
+        if (chunk.done) break;
+        total += chunk.value.byteLength;
+        if (total > this.config.runtime.maxImageBytes) {
+          await reader.cancel();
+          throw new Error("Image exceeds the configured size limit");
+        }
+        chunks.push(chunk.value);
+      }
+    } finally {
+      reader.releaseLock();
     }
+    let bytes: Uint8Array = Buffer.concat(chunks);
 
     if (contentType === "image/heic" || contentType === "image/heif") {
       bytes = new Uint8Array(await this.heicConverter({

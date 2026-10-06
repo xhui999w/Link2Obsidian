@@ -1,3 +1,5 @@
+import { TaskStore } from "./infrastructure/task-store.js";
+import { TaskQueue } from "./application/task-queue.js";
 import sensible from "@fastify/sensible";
 import Fastify, { type FastifyInstance } from "fastify";
 
@@ -56,6 +58,7 @@ export async function buildApp(
   const classifier = dependencies.classifier
     ?? new KeywordTopicClassifier(config.runtime.defaultCategory);
   const aiEnhancer = dependencies.aiEnhancer ?? createAiEnhancer(config);
+  const store = await TaskStore.open(config);
   const clipService = new ClipService(
     config,
     loader,
@@ -65,10 +68,15 @@ export async function buildApp(
     pluginRegistry,
     classifier,
     aiEnhancer,
+    store,
   );
 
+  const queue = new TaskQueue(store, clipService);
   app.addHook("onClose", async () => {
+    await queue.close();
     await loader.close();
+    if (imageLocalizer instanceof HttpImageLocalizer) await imageLocalizer.close();
+    store.close();
   });
 
   app.setErrorHandler((error, request, reply) => {
@@ -99,7 +107,8 @@ export async function buildApp(
     });
   });
 
-  await registerRoutes(app, config, clipService, pluginRegistry);
+  await registerRoutes(app, config, clipService, pluginRegistry, store, queue);
+  queue.start();
 
   return app;
 }

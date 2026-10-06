@@ -149,6 +149,7 @@ L2O_TMP_HOST_PATH=/mnt/tank/apps/link2obsidian/tmp
 
 ```bash
 curl -X POST http://NAS-IP:8080/api/clips \
+  -H "Authorization: Bearer $L2O_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"url":"https://example.com/article"}'
 ```
@@ -167,3 +168,7 @@ curl -X POST http://NAS-IP:8080/api/clips \
 - [ ] 图片位于 `Attachments`
 - [ ] 再次提交相同 URL 返回 `duplicate`
 - [ ] NAS 重启后容器自动启动
+
+## V0.2 升级注意
+
+在 `.env` 中设置长随机 `L2O_API_TOKEN`（空值无法启动 Compose），在首页输入 Token。现有快捷指令和脚本需增加 `Authorization: Bearer <token>`。保留 data 挂载，其中保存 SQLite 任务和索引；停服务后备份 Vault 和 data。首次启动一次性索引旧笔记。Node 需要 22.13+，GHCR 构建支持 amd64/arm64。上游代理仅支持 HTTP/HTTPS CONNECT。访问内网页面和图片会被阻止，局域网 AI 配置仍可使用。覆盖保留笔记路径，旧附件不自动删除。

@@ -10,7 +10,7 @@ services:
       L2O_HOST: 0.0.0.0
       L2O_PORT: 8080
       L2O_LOG_LEVEL: "${L2O_LOG_LEVEL:-info}"
-      L2O_API_TOKEN: "${L2O_API_TOKEN:-change-me}"
+      L2O_API_TOKEN: "${L2O_API_TOKEN:?Set a long random L2O_API_TOKEN in .env}"
       L2O_VAULT_PATH: /vault
       L2O_OUTPUT_DIR: "${L2O_OUTPUT_DIR:-Clippings}"
       L2O_ATTACHMENTS_DIR: "${L2O_ATTACHMENTS_DIR:-Attachments}"

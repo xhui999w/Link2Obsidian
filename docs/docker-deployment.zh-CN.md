@@ -93,6 +93,7 @@ curl http://127.0.0.1:8080/health
 
 ```bash
 curl -X POST http://127.0.0.1:8080/api/clips \
+  -H "Authorization: Bearer $L2O_API_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"url":"https://example.com/"}'
 ```
@@ -189,3 +190,7 @@ docker compose logs --tail=200 link2obsidian
 
 API 返回的 `ai` 会是 `fallback`，文章仍会按本地规则分类并保存。可以增加
 `L2O_AI_TIMEOUT_MS` 或关闭 AI。
+
+## V0.2 升级注意
+
+在 `.env` 中设置长随机 `L2O_API_TOKEN`（空值无法启动 Compose），在首页输入 Token。现有快捷指令和脚本需增加 `Authorization: Bearer <token>`。保留 data 挂载，其中保存 SQLite 任务和索引；停服务后备份 Vault 和 data。首次启动一次性索引旧笔记。Node 需要 22.13+，GHCR 构建支持 amd64/arm64。上游代理仅支持 HTTP/HTTPS CONNECT。访问内网页面和图片会被阻止，局域网 AI 配置仍可使用。覆盖保留笔记路径，旧附件不自动删除。

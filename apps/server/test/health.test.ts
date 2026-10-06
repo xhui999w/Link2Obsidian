@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 import { buildApp } from "../src/app.js";
 import type { AppConfig } from "../src/config/env.js";
@@ -41,6 +44,9 @@ const config: AppConfig = {
 };
 
 test("GET /health reports service health", async () => {
+  const root = await mkdtemp(join(tmpdir(), "l2o-health-"));
+  config.storage.dataPath = join(root, "data");
+  config.storage.vaultPath = join(root, "vault");
   const app = await buildApp(config);
   const response = await app.inject({
     method: "GET",
@@ -50,9 +56,13 @@ test("GET /health reports service health", async () => {
   assert.equal(response.statusCode, 200);
   assert.equal(response.json().status, "ok");
   await app.close();
+  await rm(root, { recursive: true, force: true });
 });
 
 test("GET / serves the mobile-friendly clipping page", async () => {
+  const root = await mkdtemp(join(tmpdir(), "l2o-home-"));
+  config.storage.dataPath = join(root, "data");
+  config.storage.vaultPath = join(root, "vault");
   const app = await buildApp(config);
   const response = await app.inject({
     method: "GET",
@@ -65,6 +75,7 @@ test("GET / serves the mobile-friendly clipping page", async () => {
   assert.match(response.body, /<meta name="viewport"/);
   assert.match(response.body, /<textarea/);
   assert.match(response.body, /保存到 Obsidian/);
-  assert.match(response.body, /fetch\("\/api\/clips"/);
+  assert.match(response.body, /api\('\/api\/tasks'/);
   await app.close();
+  await rm(root, { recursive: true, force: true });
 });

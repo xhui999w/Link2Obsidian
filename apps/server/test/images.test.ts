@@ -28,6 +28,8 @@ test("localizes images, reuses duplicate content, and keeps failed images remote
   const localizer = new HttpImageLocalizer(
     createConfig(vaultPath),
     fetchImage,
+    undefined,
+    async () => [{ address: "93.184.215.14", family: 4 }],
   );
 
   try {
@@ -92,6 +94,7 @@ test("converts HEIC images to Obsidian-compatible JPEG files", async () => {
     createConfig(vaultPath),
     fetchImage,
     convertHeic,
+    async () => [{ address: "93.184.215.14", family: 4 }],
   );
 
   try {
