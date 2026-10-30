@@ -5,6 +5,7 @@ import type { AppConfig } from "../config/env.js";
 import type { LoadedPage, PageLoader } from "../domain/clip.js";
 import { ClipError } from "../domain/errors.js";
 import { validatePublicUrl } from "./url-security.js";
+import { xFallbackUrl, renderXFallback } from "./x-fallback.js";
 import { EgressProxy } from "./egress-proxy.js";
 
 export class PlaywrightPageLoader implements PageLoader {
@@ -77,6 +78,25 @@ export class PlaywrightPageLoader implements PageLoader {
         finalUrl: page.url(),
       };
     } catch (error) {
+      const fallback = plugin.id === "x" && this.config.runtime.xFallbackEnabled !== false
+        ? xFallbackUrl(url) : undefined;
+      if (fallback) {
+        try {
+          const page = await context.newPage();
+          await validatePublicUrl(fallback);
+          const response = await page.goto(fallback, {
+            waitUntil: "domcontentloaded", timeout: this.config.runtime.pageTimeoutMs,
+          });
+          await validatePublicUrl(page.url());
+          if (!response?.ok()) throw new Error(`HTTP ${response?.status()}`);
+          const body = await response.body();
+          if (body.length > 2 * 1024 * 1024) throw new Error("Response too large");
+          return { html: renderXFallback(JSON.parse(body.toString()), url), finalUrl: url };
+        } catch (fallbackError) {
+          throw new ClipError("PAGE_LOAD_FAILED",
+            `X 页面抓取失败，备用来源 FxTwitter 也不可用：${fallbackError instanceof Error ? fallbackError.message : "Unknown error"}`, 422);
+        }
+      }
       if (error instanceof ClipError) {
         throw error;
       }
