@@ -94,7 +94,7 @@ export class PlaywrightPageLoader implements PageLoader {
           return { html: renderXFallback(JSON.parse(body.toString()), url), finalUrl: url };
         } catch (fallbackError) {
           throw new ClipError("PAGE_LOAD_FAILED",
-            `X Ò³Ãæ×¥È¡Ê§°Ü£¬±¸ÓÃÀ´Ô´ FxTwitter Ò²²»¿ÉÓÃ£º${fallbackError instanceof Error ? fallbackError.message : "Unknown error"}`, 422);
+            `X é¡µé¢æŠ“å–å¤±è´¥ï¼Œå¤‡ç”¨æ¥æº FxTwitter ä¹Ÿä¸å¯ç”¨ï¼š${fallbackError instanceof Error ? fallbackError.message : "Unknown error"}`, 422);
         }
       }
       if (error instanceof ClipError) {
