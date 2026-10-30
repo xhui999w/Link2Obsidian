@@ -78,3 +78,10 @@ Legacy files are indexed once on first startup. Later URL lookup uses the index,
 Queued work resumes after restart; interrupted processing work becomes failed for manual retry. Retries create separate history entries. Overwrite keeps the original path/category folder, replaces the note after successful extraction, and uses a fresh attachment folder. No automatic attachment deletion.
 
 User-submitted URLs and image redirects must resolve exclusively to public IPv4/IPv6 addresses. The egress proxy pins the validated address to the outgoing socket, including browser subresources and HTTPS CONNECT tunnels. Final page URLs are checked again. This does not restrict the administrator-configured AI endpoint; LAN Ollama remains supported.
+
+
+### X fallback source
+
+When loading X fails, public posts are retrieved from FxTwitter (`https://api.fxtwitter.com/status/<post-id>`) by default. Only the post ID is sent; no tokens, cookies or login credentials. Notes include attribution and retain the X URL. Photos are localized; videos remain links. Third-party availability is not guaranteed; private/deleted posts still fail.
+
+Set `L2O_X_FALLBACK_ENABLED=false` to disable. Docker users must pass it through Compose environment and recreate the container.

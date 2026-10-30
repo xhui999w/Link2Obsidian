@@ -276,3 +276,10 @@ SQLite 文件位于 `L2O_DATA_PATH/tasks.sqlite`，只保存任务元数据与 U
 队列使用单个持久化工作线程：待处理任务重启后继续，正在处理的任务标记失败并允许手动重试，不自动重复覆盖文件。同一 data 目录只运行一个实例。
 
 GHCR 构建目标为 `linux/amd64,linux/arm64`。配置的上游代理需为支持 CONNECT 的 HTTP/HTTPS 代理；V0.2 不再支持 SOCKS 代理。SSRF 防护用于用户网页及图片请求，管理员配置的 AI 服务可继续使用局域网 Ollama。HTTPS 反向代理用于保护传输中的 Token。
+
+
+### X 抓取备用来源
+
+X 原页访问失败时，默认通过 FxTwitter (`https://api.fxtwitter.com/status/<帖子ID>`) 获取公开帖文全文和图片。仅发送帖子 ID，不发送 Token、Cookie 或登录凭据。笔记注明来源，保留 X 原链接；图片本地化，视频仅保留链接。第三方服务可用性不保证，私密或已删除帖子仍会失败。
+
+`L2O_X_FALLBACK_ENABLED=false` 可禁用备用来源；Docker 用户需将该变量加入 Compose environment 并重新创建容器。

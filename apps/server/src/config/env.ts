@@ -30,6 +30,7 @@ export interface AppConfig {
     duplicatePolicy: DuplicatePolicy;
     defaultCategory: string;
     proxyServer?: string;
+    xFallbackEnabled?: boolean;
   };
   ai: {
     enabled: boolean;
@@ -122,6 +123,7 @@ export function loadConfig(): AppConfig {
         ["overwrite", "skip", "suffix"] as const,
       ),
       proxyServer: process.env.L2O_PROXY_SERVER,
+      xFallbackEnabled: booleanValue("L2O_X_FALLBACK_ENABLED", true),
       defaultCategory: process.env.L2O_DEFAULT_CATEGORY ?? "生活经验",
     },
     ai: {

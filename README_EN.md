@@ -179,3 +179,10 @@ One durable worker runs per instance. Queued tasks resume on restart; interrupte
 GHCR targets `linux/amd64,linux/arm64`. Upstream proxies must be HTTP/HTTPS and support CONNECT; SOCKS is no longer supported. All user page and image connections pin validated public DNS addresses, and redirects/final URLs are checked. Administrator-configured AI endpoints can still use LAN Ollama. Use HTTPS when transmitting the API token.
 
 WeChat, Toutiao and Zhihu use site-specific plugin selectors; Instagram and X support posts and images. Login walls, CAPTCHA and changes in page structure can still affect extraction.
+
+
+### X fallback source
+
+When loading X fails, public posts are retrieved from FxTwitter (`https://api.fxtwitter.com/status/<post-id>`) by default. Only the post ID is sent; no tokens, cookies or login credentials. Notes include attribution and retain the X URL. Photos are localized; videos remain links. Third-party availability is not guaranteed; private/deleted posts still fail.
+
+Set `L2O_X_FALLBACK_ENABLED=false` to disable. Docker users must pass it through Compose environment and recreate the container.

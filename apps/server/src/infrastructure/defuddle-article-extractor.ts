@@ -30,9 +30,11 @@ export class DefuddleArticleExtractor implements ArticleExtractor {
       document,
       plugin.extraction?.titleSelectors,
     ) || (result.title ?? "").trim();
-    const html = plugin.extraction?.openGraphContent
+    const fallbackHtml = plugin.id === "x"
+      ? document.querySelector("article[data-l2o-x]")?.innerHTML : undefined;
+    const html = fallbackHtml ?? (plugin.extraction?.openGraphContent
       ? openGraphContent(document)
-      : (result.content ?? "").trim();
+      : (result.content ?? "").trim());
     const hostname = new URL(page.finalUrl).hostname.replace(/^www\./, "");
     const source = firstSelectorValue(
       document,
