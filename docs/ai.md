@@ -4,7 +4,7 @@ AI enhancement is an optional, best-effort module. It adds:
 
 - a short summary;
 - keywords;
-- a category suggestion;
+- an internal topic suggestion (never used to change the platform folder);
 - Obsidian tags.
 
 The module is disabled by default. The normal browser, extraction, image,
