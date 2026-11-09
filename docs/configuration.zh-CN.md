@@ -98,3 +98,11 @@ L2O_AI_ENABLED=false
 X 原页访问失败时，默认通过 FxTwitter (`https://api.fxtwitter.com/status/<帖子ID>`) 获取公开帖文全文和图片。仅发送帖子 ID，不发送 Token、Cookie 或登录凭据。笔记注明来源，保留 X 原链接；图片本地化，视频仅保留链接。第三方服务可用性不保证，私密或已删除帖子仍会失败。
 
 `L2O_X_FALLBACK_ENABLED=false` 可禁用备用来源；Docker 用户需将该变量加入 Compose environment 并重新创建容器。
+
+
+新增笔记按平台目录归档；文件名时间使用 `L2O_TIMEZONE`。`L2O_DEFAULT_CATEGORY` 仅供主题标签推断兼容使用，不控制保存目录。AI 的分类建议不再改变保存目录。已有笔记不自动移动，覆盖时保留路径和收藏时间。
+
+
+### 整理已有文章
+
+先停止服务，在 NAS 主机使用 Python 3.9+ 执行 `scripts/migrate-platform.py --vault /真实Vault路径 --db /真实data路径/tasks.sqlite` 预览。确认后加 `--apply --backup /Vault以外的全新备份目录`。脚本保留正文、附件引用和收藏时间，更新笔记索引及所有相关任务路径；缺少日期或来源的文件跳过并报告。不遍历符号链接，不覆盖同名文件。备份包含原文件、数据库快照和路径清单，发生操作错误自动回滚。附件目录不移动。执行期间保持服务停止，完成后启动服务。Windows 使用 IANA 时区需安装 tzdata；NAS 主机通常自带时区库。已有 aliases 原样保留，没有 aliases 的笔记补充旧文件名别名。

@@ -25,7 +25,7 @@ Link2Obsidian 是一个运行在 NAS 上的自动化采集工具：
 - SQLite 索引查重；重复文章可跳过、覆盖或另存新版，正文只保存在 Vault
 - API Token 鉴权及公网地址校验，拦截内网访问和危险跳转
 - 自动生成中文安全文件名
-- 按知识主题保存到十个默认目录
+- 按平台保存到固定目录，文件名带收藏时间，按名称即可排序
 - 自动生成主题标签，并保留网站来源标签
 - 内置普通网页、微信、今日头条、知乎、Instagram、X（Twitter）适配插件
 - 可选 AI 摘要、关键词、分类建议和标签
@@ -36,7 +36,12 @@ Link2Obsidian 是一个运行在 NAS 上的自动化采集工具：
 
 ![提交链接并保存文章](docs/assets/api-example.svg)
 
-![Obsidian Vault 文件结构](docs/assets/vault-example.svg)
+```text
+Clippings/
+  头条/2026-11-08 203000 - 文章标题.md
+  微信/2026-11-08 203100 - 文章标题.md
+  X/2026-11-08 203200 - 帖子标题.md
+```
 
 ## 三步安装
 
@@ -283,3 +288,8 @@ GHCR 构建目标为 `linux/amd64,linux/arm64`。配置的上游代理需为支�
 X 原页访问失败时，默认通过 FxTwitter (`https://api.fxtwitter.com/status/<帖子ID>`) 获取公开帖文全文和图片。仅发送帖子 ID，不发送 Token、Cookie 或登录凭据。笔记注明来源，保留 X 原链接；图片本地化，视频仅保留链接。第三方服务可用性不保证，私密或已删除帖子仍会失败。
 
 `L2O_X_FALLBACK_ENABLED=false` 可禁用备用来源；Docker 用户需将该变量加入 Compose environment 并重新创建容器。
+
+
+### 平台归档与时间排序
+
+新增笔记按来源保存到 `Clippings/头条`、`微信`、`知乎`、`X`、`Instagram` 或 `网页`。文件名为 `YYYY-MM-DD HHmmss - 标题.md`，使用 `L2O_TIMEZONE`（默认上海）的收藏时间，按名称排序即可按时间浏览。AI 可补充摘要和标签，不改变平台目录。同一秒的同名文件自动加序号。覆盖已有笔记保留原路径和收藏时间；跳过不改变已有文件，另存新版使用新的收藏时间。已有目录不自动移动。

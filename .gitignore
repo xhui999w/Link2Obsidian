@@ -12,3 +12,5 @@ tmp/*
 vault/*
 !vault/.gitkeep
 
+
+__pycache__/

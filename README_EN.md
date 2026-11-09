@@ -186,3 +186,8 @@ WeChat, Toutiao and Zhihu use site-specific plugin selectors; Instagram and X su
 When loading X fails, public posts are retrieved from FxTwitter (`https://api.fxtwitter.com/status/<post-id>`) by default. Only the post ID is sent; no tokens, cookies or login credentials. Notes include attribution and retain the X URL. Photos are localized; videos remain links. Third-party availability is not guaranteed; private/deleted posts still fail.
 
 Set `L2O_X_FALLBACK_ENABLED=false` to disable. Docker users must pass it through Compose environment and recreate the container.
+
+
+### Platform folders and chronological names
+
+New notes use platform folders: `头条`, `微信`, `知乎`, `X`, `Instagram`, or `网页` under Clippings. Filenames use `YYYY-MM-DD HHmmss - Title.md` in `L2O_TIMEZONE` (default Asia/Shanghai), so name sorting orders notes by collection time. AI enriches tags and summaries without changing folders. Same-second filename collisions receive a numeric suffix. Overwrite preserves the original path and collection time; skip leaves files untouched; save-version uses a new timestamp. Existing notes are not moved automatically.

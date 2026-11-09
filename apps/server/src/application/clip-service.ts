@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import {
   access,
+  readFile,
   mkdir,
   writeFile,
   rename,
@@ -24,6 +25,7 @@ import type {
   PageLoader,
   PluginRegistry,
 } from "../domain/clip.js";
+import { platformFolder, collectionPrefix } from "./archive-layout.js";
 import { ClipError } from "../domain/errors.js";
 
 export class ClipService {
@@ -100,7 +102,8 @@ export class ClipService {
       html: article.html,
       sourceTag: extractionPlugin.sourceTag,
     });
-    let category = baseline.category;
+    let category = platformFolder(extractionPlugin.id === "general" ? inputPlugin.id : extractionPlugin.id);
+    let created = new Date().toISOString();
     let tags = baseline.tags;
     let summary: string | undefined;
     let keywords: string[] | undefined;
@@ -122,7 +125,7 @@ export class ClipService {
           allowedCategories: DEFAULT_CATEGORIES,
         });
         if (enhancement) {
-          category = enhancement.category ?? baseline.category;
+          // AI may enrich tags and summaries, but never changes the platform folder.
           tags = enhancement.tags.length
             ? uniqueTags(enhancement.tags, extractionPlugin.sourceTag)
             : baseline.tags;
@@ -138,13 +141,16 @@ export class ClipService {
     }
     if (policy === "overwrite" && duplicate) {
       category = categoryFromPath(outputRoot, duplicate) ?? category;
+      const previous = await readFile(duplicate, "utf8");
+      const saved = previous.match(/^收藏时间:\s*(.+)$/m)?.[1];
+      if (saved && !Number.isNaN(Date.parse(saved))) created = new Date(saved).toISOString();
     }
     const outputDirectory = resolveCategoryDirectory(
       outputRoot,
       category,
     );
     await mkdir(outputDirectory, { recursive: true });
-    const visibleBasename = safeFilename(article.title);
+    const visibleBasename = `${collectionPrefix(new Date(created), this.config.runtime.timezone)} - ${safeFilename(article.title)}`;
     const attachmentBasename = `${visibleBasename}--${key}--${randomUUID()}`;
     const destination = policy === "overwrite" && duplicate
       ? duplicate : await availableNotePath(outputDirectory, visibleBasename);
@@ -157,7 +163,7 @@ export class ClipService {
     const body = this.markdownConverter.convert(localized.html);
     const markdown = renderMarkdown({
       url: originalUrl,
-      created: new Date().toISOString(),
+      created,
       category,
       tags,
       summary,

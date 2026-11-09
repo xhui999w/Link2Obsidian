@@ -1,10 +1,8 @@
 # Topic classification
 
-Link2Obsidian uses a lightweight, deterministic keyword classifier to suggest
-where an article should be saved in the Vault. It does not create a knowledge
-base and does not call an AI service.
+New notes are archived by platform (头条, 微信, 知乎, X, Instagram, 网页), with a collection timestamp in each filename. Topic classification only enriches tags; it does not select the archive directory. AI cannot override platform folders.
 
-## Default categories
+## Topic categories (for tag suggestions only)
 
 - 健康养生
 - 运动健康
@@ -23,8 +21,7 @@ produces topic tags. If no rule matches, the article uses
 
 ## Source handling
 
-Source does not determine the category. Built-in site plugins may append a
-source tag:
+Source determines the archive folder. Built-in site plugins also append a source tag:
 
 | Plugin | Source tag |
 | --- | --- |
@@ -44,8 +41,8 @@ Obsidian presents these as `#健康`, `#睡眠`, and `#Instagram`.
 ```text
 Vault/
 └── Clippings/
-    └── 健康养生/
-        └── 改善睡眠--a1b2c3d4e5.md
+    └── 头条/
+        └── 2026-11-08 203000 - 改善睡眠.md
 ```
 
 Classification rules are defined in
