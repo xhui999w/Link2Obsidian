@@ -88,3 +88,8 @@ Set `L2O_X_FALLBACK_ENABLED=false` to disable. Docker users must pass it through
 
 
 New notes use platform folders with timestamped names in `L2O_TIMEZONE`. `L2O_DEFAULT_CATEGORY` remains compatible for topic-tag inference, but no longer controls directories. AI classification never changes archive folders. Existing notes are not moved automatically; overwrite preserves the existing path and collection time.
+
+
+### Reorganize existing notes
+
+Stop the service, then preview with Python 3.9+: `python3 scripts/migrate-platform.py --vault /actual/vault --db /actual/data/tasks.sqlite`. To migrate, add `--apply --backup /new/private/directory/outside/vault`. The tool preserves article bodies, attachment references and collection timestamps, updating both note indexes and task/result paths. It skips files with unknown dates/URLs, avoids symlinks and filename collisions, and backs up originals, the database and a path manifest. Operation errors roll back automatically. Keep the service stopped until finished. Photos are never moved. On Windows, IANA timezone support requires tzdata. Old basenames are added as aliases when no user-authored aliases exist.

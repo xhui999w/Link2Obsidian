@@ -31,6 +31,9 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Test old-note migration
+        run: python3 scripts/test_migrate_platform.py
+
       - name: Build
         run: npm run build
 
